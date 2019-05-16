@@ -12,10 +12,9 @@ class test1_:
     #sanitizes input
     def sanitize(self, lineTemp, lineNo):
         lineTemp = re.sub("TestValue", "TestValue,", lineTemp)
-        if((self.lineLeakageStart==-1) or (lineNo<self.lineLeakageStart)):
-            matchObj = re.match( ".*", lineTemp, re.M|re.I)
-            string = matchObj(1)
-            lineTemp = re.sub(".*",string, lineTemp)
+        #tests if in first dataset
+        #if((self.lineLeakageStart==-1) or (lineNo<self.lineLeakageStart)):
+            #a=1
 
         #removes - < : from file
         lineTemp = re.sub("[-]+", "", lineTemp)

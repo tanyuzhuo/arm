@@ -1,14 +1,8 @@
 import csv
 import re
+import os
 
 class test1_:
-    #adds file and init. variables
-    def input(self, fileInput='104_TT_150C.txt'):
-        self.fileName=fileInput
-        self.fileLinesNo = sum(1 for line in open(fileInput))
-        self.lineLeakageStart = -1
-        self.lineLeakageEnd = -1
-
     #sanitizes input
     def sanitize(self, lineTemp, lineNo):
         lineTemp = re.sub("TestValue", "TestValue,P/F", lineTemp)
@@ -42,9 +36,9 @@ class test1_:
         lineTemp = re.sub("\s+", ",", lineTemp)
         return lineTemp
 
-    def genLines(self):
+    def genLines(self, inFileName):
         #open file
-        with open(self.fileName, 'r') as in_file:
+        with open(inFileName, 'r') as in_file:
             #output list
             self.allLines = []
             self.meta = []
@@ -296,70 +290,88 @@ class test1_:
 
 
 
-    def genFullCSV(self, fileOutput="fullOutput.csv"):
+    def genFullCSV(self, filePath="default"):
         #opens output file
-        with open(fileOutput, "w") as out_file:
+        test1.makeDir(filePath)
+        with open(filePath+"/fullOutput.csv", "w") as out_file:
             #writes csv file from list
             writer = csv.writer(out_file)
             writer.writerows(self.allLines)
 
-    def genMetaCSV(self, fileOutput="metaOutput.csv"):
+    def genMetaCSV(self, filePath="default"):
         #opens output file
-        with open(fileOutput, "w") as out_file:
+        test1.makeDir(filePath)
+        with open(filePath+"/metaOutput.csv", "w") as out_file:
             #writes csv file from list
             writer = csv.writer(out_file)
             writer.writerows(self.meta)
 
-    def genThrowawayCSV(self, fileOutput="ThrowawayOutput.csv"):
+    def genThrowawayCSV(self, filePath="default"):
         #opens output file
-        with open(fileOutput, "w") as out_file:
+        test1.makeDir(filePath)
+        with open(filePath+"/throwawayOutput.csv", "w") as out_file:
             #writes csv file from list
             writer = csv.writer(out_file)
             writer.writerows(self.throwawayData)
 
-    def genPinsCSV(self, fileOutput="pinsOutput.csv"):
+    def genPinsCSV(self, filePath="default"):
         #opens output file
-        with open(fileOutput, "w") as out_file:
+        test1.makeDir(filePath)
+        with open(filePath+"/pinsOutput.csv", "w") as out_file:
             #writes csv file from list
             writer = csv.writer(out_file)
             writer.writerows(self.pinsData)
 
-    def genLeakageCSV(self, fileOutput="leakageOutput.csv"):
+    def genLeakageCSV(self, filePath="default"):
         #opens output file
-        with open(fileOutput, "w") as out_file:
+        test1.makeDir(filePath)
+        with open(filePath+"/leakageOutput.csv", "w") as out_file:
             #writes csv file from list
             writer = csv.writer(out_file)
             writer.writerows(self.leakageData)
 
-    def genStdVminCSV(self, fileOutput="vminStdOutput.csv"):
+    def genStdVminCSV(self, filePath="default"):
         #opens output file
-        with open(fileOutput, "w") as out_file:
+        test1.makeDir(filePath)
+        with open(filePath+"/vminStdOutput.csv", "w") as out_file:
             #writes csv file from list
             writer = csv.writer(out_file)
             writer.writerows(self.vminStdData)
 
-    def genMemCSV(self, fileOutput="memYdOutput.csv"):
+    def genMemCSV(self, filePath="default"):
         #opens output file
-        with open(fileOutput, "w") as out_file:
+        test1.makeDir(filePath)
+        with open(filePath+"/memYdOutput.csv", "w") as out_file:
             #writes csv file from list
             writer = csv.writer(out_file)
             writer.writerows(self.memYdData)
 
-    def genAutoVminCSV(self, fileOutput="vminAutoOutput.csv"):
+    def genAutoVminCSV(self, filePath="default"):
         #opens output file
-        with open(fileOutput, "w") as out_file:
+        test1.makeDir(filePath)
+        with open(filePath+"/vminAutoOutput.csv", "w") as out_file:
             #writes csv file from list
             writer = csv.writer(out_file)
             writer.writerows(self.vminAutoData)
 
+    def makeDir(self,path):
+        try:
+            os.mkdir(path)
+        except OSError:
+            pass
+
+    def makeAllCSVs(self, fileInput="default.txt"):
+        test1.genLines(fileInput)
+        folderName=fileInput[:-4]
+        test1.makeDir(folderName)
+        test1.genFullCSV(folderName)
+        test1.genMetaCSV(folderName)
+        test1.genThrowawayCSV(folderName)
+        test1.genPinsCSV(folderName)
+        test1.genLeakageCSV(folderName)
+        test1.genStdVminCSV(folderName)
+        test1.genMemCSV(folderName)
+        test1.genAutoVminCSV(folderName)
+
 test1 = test1_()
-test1.input()
-test1.genLines()
-test1.genFullCSV()
-test1.genMetaCSV()
-test1.genThrowawayCSV()
-test1.genPinsCSV()
-test1.genLeakageCSV()
-test1.genStdVminCSV()
-test1.genMemCSV()
-test1.genAutoVminCSV()
+test1.makeAllCSVs('104_TT_150C.txt')

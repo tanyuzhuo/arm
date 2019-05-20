@@ -1,6 +1,7 @@
 import csv
 import re
 import os
+import sys
 
 class test1_:
     #sanitizes input
@@ -374,4 +375,5 @@ class test1_:
         test1.genAutoVminCSV(folderName)
 
 test1 = test1_()
-test1.makeAllCSVs('104_TT_150C.txt')
+for i in range(len(sys.argv)-1):
+    test1.makeAllCSVs(sys.argv[i+1])

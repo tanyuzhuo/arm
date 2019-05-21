@@ -142,10 +142,14 @@ class test1_:
                             if (re.match("\([0-9]+,pins\),FAILED,\=,",lineTemp) and (failedCheckFlag is 1)):
                                 tempList = []
                                 tempList.append(lineTemp)
-                                print(tempList)
-                                print(re.search("(?<=\()[0-9]+(?=,pins\),FAILED,)",tempList[0]))
                                 tempList.insert(0,re.search("(?<=\()[0-9]+(?=,pins\),FAILED,)",tempList[0]).group(0))
-                                #tempList[1]=re.sub("([0-9]+,pins\),FAILED,\=,\{","",tempList[1])
+                                tempList[1]=re.sub("\([0-9]+,pins\),FAILED,\=,\{,","",tempList[1])
+
+                                while(re.search("[A-Z0-9_]+?,",tempList[len(tempList)-1])):
+                                    tempString = re.search("[A-Z0-9_]+?,",tempList[len(tempList)-1]).group(0)
+                                    tempString = tempString[:-1]+'/'
+                                    tempList[len(tempList)-1] = re.sub("[A-Z0-9_]+?,",tempString,tempList[len(tempList)-1])
+                                tempList[len(tempList)-1] = tempList[len(tempList)-1][:-2]
 
                                 self.memYdData[len(self.memYdData)-1].pop(len(self.memYdData[len(self.memYdData)-1])-1)
                                 self.memYdData[len(self.memYdData)-1].extend(tempList)
@@ -154,7 +158,7 @@ class test1_:
                                 failedCheckFlag=1
                                 if(firstMemYdFlag is 0):
                                     firstMemYdFlag = 1
-                                    tempList = ["Test_Number","Testing_Type","A/S","Test(META???)","Location_Type","Test_Location","??","EMA#1","EMA#2","EMAW","EMAS","EMAP","WABL","WABLM","RAWL","RAWLM","KEN","RANGE","Value"]
+                                    tempList = ["Test_Number","Testing_Type","A/S","Test(META???)","Location_Type","Test_Location","??","EMA#1","EMA#2","EMAW","EMAS","EMAP","WABL","WABLM","RAWL","RAWLM","KEN","RANGE","Value","Number_of_Failed_Pins","Failed_Pins"]
                                     self.memYdData.append(tempList)
                                     self.allLines.append(tempList)
 
@@ -356,6 +360,9 @@ class test1_:
             #writes csv file from list
             writer = csv.writer(out_file)
             writer.writerows(self.throwawayData)
+            throwawayDataSize=len(self.throwawayData)
+            if(throwawayDataSize>0):
+                print("file \""+filePath+"\".txt has "+str(throwawayDataSize)+" unrecognized lines")
 
     def genPinsCSV(self, filePath="default"):
         #opens output file

@@ -361,7 +361,7 @@ TstNum Pin  Chn     PinName   TestBlock       TestName        ForceValue   LowLi
      tb_leakage_high	          RET1N_leakage_high_2uA_range_vdd_1.050V_dvdd_1.800V_0.0ns         	   0.006 uA   	   
      tb_leakage_high	          RET2N_leakage_high_2uA_range_vdd_1.050V_dvdd_1.800V_0.0ns         	   0.000 uA   	   
      tb_leakage_high	      SC_RESETN_leakage_high_2uA_range_vdd_1.050V_dvdd_1.800V_0.0ns         	   0.000 uA   	   
-     tb_leakage_high	          SEL_0_leakage_high_2uA_range_vdd_1.050V_dvdd_1.800V_0.0ns         	   0.012 uA   	   
+     tb_leakage_high	          SEL_0_leakage_high_2uA_range_vdd_1.050V_dvdd_1.800V_0.0ns         	   0.012 uA
      tb_leakage_high	          SEL_1_leakage_high_2uA_range_vdd_1.050V_dvdd_1.800V_0.0ns         	   0.006 uA   	   
      tb_leakage_high	          SEL_2_leakage_high_2uA_range_vdd_1.050V_dvdd_1.800V_0.0ns         	  -0.006 uA   	   
      tb_leakage_high	          SEL_3_leakage_high_2uA_range_vdd_1.050V_dvdd_1.800V_0.0ns         	   0.006 uA   	   

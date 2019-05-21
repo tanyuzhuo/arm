@@ -22,7 +22,7 @@ class test1_:
 
         #edge cases
         lineTemp = re.sub("[\s](Cont)[\s](N)[\s]", " Cont_N ", lineTemp)
-        lineTemp = re.sub("[\s](TOTAL)[\s](TEST)[\s](TIME)[\s]", " TOTAL_TEST_TIME ", lineTemp)
+        lineTemp = re.sub("[\s](TOTAL)[\s]+(TEST)[\s]+(TIME)", " TOTAL_TEST_TIME ", lineTemp)
 
         #same as above but checks in case it doesnt end in whitespace
         lineTemp = re.sub("[\s]+(mV)(\Z)", "_mV", lineTemp)
@@ -55,8 +55,10 @@ class test1_:
             firstStdVminFlag=0
             firstAutoVminFlag=0
             vminAutoShmooFlag=0
+            failedCheckFlag=0
             firstMemYdFlag=0
             counter=0
+            match=0
             for line_number, line in enumerate(in_file, 1):
 
                 #removes inital and final whitespace
@@ -66,27 +68,35 @@ class test1_:
                 #splits on commas
                 lineFinal = lineTemp.split(",")
                 if(re.match("SITE",lineTemp)):
+                    match=1
                     counter+=1
+                    self.meta.append(lineFinal)
+                    self.allLines.append(lineFinal)
+                if(re.match("TestStarted\(",lineTemp) or re.match("dut1",lineTemp)):
+                    match=1
+                    self.meta.append(lineFinal)
                     self.allLines.append(lineFinal)
                 if(not re.search("^$",lineTemp)):
-                    #appends to an array and returns it class wide
-                    self.allLines.append(lineFinal)
-
-                    #checks if running times
                     if(counter > 1):
                         self.meta.append(lineFinal)
+                        self.allLines.append(lineFinal)
                     else:
-                        #checks if it is a pin data line
-                        if(re.search("\ATSTNum,Pin,Chn",lineTemp) or (len(lineFinal) is 10) or (len(lineFinal) is 11)):
+                        if(re.match("TstNum,Pin,Chn",lineTemp) or (((len(lineFinal) is 10) or (len(lineFinal) is 11))) and re.match("[0-9]+?,[A-Z0-9]+?,[a-z0-9_]+?,[A-Z0-9_]+?,[a-zA-Z_]+?",lineTemp)):
+                            match=1
+                            failedCheckFlag=0
                             if(not (lineFinal[0]=="TstNum")):
                                 if(lineFinal[9] != "(F)"):
                                     lineFinal.insert(9,"(P)")
                             self.pinsData.append(lineFinal)
+                            self.allLines.append(lineFinal)
                         if(re.search("\Atb_leakage_",lineTemp)):
+                            match=1
+                            failedCheckFlag=0
                             if(firstLeakageFlag is 0):
                                 firstLeakageFlag = 1
                                 tempList = ["Test","Testing_Item","Test_(Repeat)","Range","Value"]
                                 self.leakageData.append(tempList)
+                                self.allLines.append(tempList)
 
                             lineFinal.insert(1,re.match("[a-zA-Z0-9_]+(?=_leakage)",lineFinal[1]).group(0))
                             lineFinal[2]=re.sub("\A[a-zA-Z0-9_]+(?=leakage)","",lineFinal[2])
@@ -95,11 +105,15 @@ class test1_:
                             lineFinal[3]=re.sub("\A[a-zA-Z0-9_]+(?=2uA)","",lineFinal[3])
 
                             self.leakageData.append(lineFinal)
+                            self.allLines.append(lineFinal)
                         if(re.search("\A[0-9]+,tb_sc_yd_vmin_shm",lineTemp) or re.search("\Ashmoo_bsmin_vec_stdcell_",lineTemp)):
+                            match=1
+                            failedCheckFlag=0
                             if(firstStdVminFlag is 0):
                                 firstStdVminFlag = 1
                                 tempList = ["Test_Number","Test_Type","Testing_Item","Test_Type","Library","Range","Result","Test_Type_(Shmoo)","Testing_Item_(Shmoo)","Library_(Shmoo)","Result_(Shmoo)"]
                                 self.vminStdData.append(tempList)
+                                self.allLines.append(lineFinal)
 
                             if(re.search("\Ashmoo_bsmin_vec_stdcell_",lineTemp)):
                                 lineFinal.insert(0,re.match("[a-zA-Z0-9_]+(?=_sc)",lineFinal[0]).group(0))
@@ -109,6 +123,7 @@ class test1_:
                                 lineFinal[2]=re.sub("\A[a-zA-Z0-9_]+(?=sfk)","",lineFinal[2])
 
                                 self.vminStdData[len(self.vminStdData)-1].extend(lineFinal)
+                                self.allLines[len(self.allLines)-1].extend(lineFinal)
                             else:
                                 lineFinal.insert(2,re.match("[a-zA-Z0-9_]+(?=_sc)",lineFinal[2]).group(0))
                                 lineFinal[3]=re.sub("\A[a-zA-Z0-9_]+(?=sc)","",lineFinal[3])
@@ -120,67 +135,90 @@ class test1_:
                                 lineFinal[5]=re.sub("\A[a-zA-Z0-9_]+(?=pattern)","",lineFinal[5])
 
                                 self.vminStdData.append(lineFinal)
-                        if(re.match("[0-9]+?,tb_mem_yd_ckb",lineTemp)):
-                            if(firstMemYdFlag is 0):
-                                firstMemYdFlag = 1
-                                tempList = ["Test_Number","Testing_Type","A/S","Test(META???)","Location_Type","Test_Location","??","EMA#1","EMA#2","EMAW","EMAS","EMAP","WABL","WABLM","RAWL","RAWLM","KEN","RANGE","Value"]
-                                self.memYdData.append(tempList)
+                                self.allLines.append(lineFinal)
 
-                            lineFinal.insert(1,re.match("tb_mem_yd_ckb",lineFinal[1]).group(0))
-                            lineFinal[2]=re.sub("\Atb_mem_yd_ckb_","",lineFinal[2])
+                        if(re.match("[0-9]+?,tb_mem_yd_ckb",lineTemp) or ((re.match("\([0-9]+?,pins\),FAILED",lineTemp) and (failedCheckFlag is 1)))):
+                            match=1
+                            if (re.match("\([0-9]+,pins\),FAILED,\=,",lineTemp) and (failedCheckFlag is 1)):
+                                tempList = []
+                                tempList.append(lineTemp)
+                                print(tempList)
+                                print(re.search("(?<=\()[0-9]+(?=,pins\),FAILED,)",tempList[0]))
+                                tempList.insert(0,re.search("(?<=\()[0-9]+(?=,pins\),FAILED,)",tempList[0]).group(0))
+                                #tempList[1]=re.sub("([0-9]+,pins\),FAILED,\=,\{","",tempList[1])
 
-                            lineFinal.insert(3,re.match("func_vec",lineFinal[3]).group(0))
-                            lineFinal[4]=re.sub("\Afunc_vec_","",lineFinal[4])
-
-                            if(re.match("[a-zA-Z0-9]+?(?=_)",lineFinal[4]).group(0) == "cln16ffcll"):
-                                lineFinal.insert(4,re.match("[a-zA-Z0-9_]+?(?=_w)",lineFinal[4]).group(0))
-                                lineFinal[5]=re.sub("\A[a-zA-Z0-9_]+?(?=w)","",lineFinal[5])
+                                self.memYdData[len(self.memYdData)-1].pop(len(self.memYdData[len(self.memYdData)-1])-1)
+                                self.memYdData[len(self.memYdData)-1].extend(tempList)
+                                failedCheckFlag=0
                             else:
-                                lineFinal.insert(4,re.match("[a-zA-Z0-9]+?(?=_)",lineFinal[4]).group(0))
-                                lineFinal[5]=re.sub("\A[a-zA-Z0-9]+?_","",lineFinal[5])
+                                failedCheckFlag=1
+                                if(firstMemYdFlag is 0):
+                                    firstMemYdFlag = 1
+                                    tempList = ["Test_Number","Testing_Type","A/S","Test(META???)","Location_Type","Test_Location","??","EMA#1","EMA#2","EMAW","EMAS","EMAP","WABL","WABLM","RAWL","RAWLM","KEN","RANGE","Value"]
+                                    self.memYdData.append(tempList)
+                                    self.allLines.append(tempList)
 
-                            lineFinal.insert(5,re.match("[a-zA-Z0-9]+?(?=_)",lineFinal[5]).group(0))
-                            lineFinal[6]=re.sub("\A[a-zA-Z0-9]+?_","",lineFinal[6])
+                                lineFinal.insert(1,re.match("tb_mem_yd_ckb",lineFinal[1]).group(0))
+                                lineFinal[2]=re.sub("\Atb_mem_yd_ckb_","",lineFinal[2])
 
-                            lineFinal.insert(6,re.match("[a-zA-Z0-9_]+?(?=_ema)",lineFinal[6]).group(0))
-                            lineFinal[7]=re.sub("\A[a-zA-Z0-9_]+?(?=ema)","",lineFinal[7])
+                                lineFinal.insert(3,re.match("func_vec",lineFinal[3]).group(0))
+                                lineFinal[4]=re.sub("\Afunc_vec_","",lineFinal[4])
 
-                            lineFinal.insert(7,re.search("(?<=ema)[a-zA-Z0-9_]+?(?=_ema)",lineFinal[7]).group(0))
-                            lineFinal[8]=re.sub("\A[a-zA-Z0-9_]+?(?=ema)","",lineFinal[8])
+                                if(re.match("[a-zA-Z0-9]+?(?=_)",lineFinal[4]).group(0) == "cln16ffcll"):
+                                    lineFinal.insert(4,re.match("[a-zA-Z0-9_]+?(?=_w)",lineFinal[4]).group(0))
+                                    lineFinal[5]=re.sub("\A[a-zA-Z0-9_]+?(?=w)","",lineFinal[5])
+                                else:
+                                    lineFinal.insert(4,re.match("[a-zA-Z0-9]+?(?=_)",lineFinal[4]).group(0))
+                                    lineFinal[5]=re.sub("\A[a-zA-Z0-9]+?_","",lineFinal[5])
 
-                            lineFinal.insert(8,re.search("(?<=ema)[a-zA-Z0-9_]+?(?=_emaw)",lineFinal[8]).group(0))
-                            lineFinal[9]=re.sub("\A[a-zA-Z0-9_]+?(?=emaw)","",lineFinal[9])
+                                lineFinal.insert(5,re.match("[a-zA-Z0-9]+?(?=_)",lineFinal[5]).group(0))
+                                lineFinal[6]=re.sub("\A[a-zA-Z0-9]+?_","",lineFinal[6])
 
-                            lineFinal.insert(9,re.search("(?<=emaw)[a-zA-Z0-9_]+?(?=_emas)",lineFinal[9]).group(0))
-                            lineFinal[10]=re.sub("\A[a-zA-Z0-9_]+?(?=emas)","",lineFinal[10])
+                                lineFinal.insert(6,re.match("[a-zA-Z0-9_]+?(?=_ema)",lineFinal[6]).group(0))
+                                lineFinal[7]=re.sub("\A[a-zA-Z0-9_]+?(?=ema)","",lineFinal[7])
 
-                            lineFinal.insert(10,re.search("(?<=emas)[a-zA-Z0-9_]+?(?=_emap)",lineFinal[10]).group(0))
-                            lineFinal[11]=re.sub("\A[a-zA-Z0-9_]+?(?=emap)","",lineFinal[11])
+                                lineFinal.insert(7,re.search("(?<=ema)[a-zA-Z0-9_]+?(?=_ema)",lineFinal[7]).group(0))
+                                lineFinal[8]=re.sub("\A[a-zA-Z0-9_]+?(?=ema)","",lineFinal[8])
 
-                            lineFinal.insert(11,re.search("(?<=emap)[a-zA-Z0-9_]+?(?=_wabl)",lineFinal[11]).group(0))
-                            lineFinal[12]=re.sub("\A[a-zA-Z0-9_]+?(?=wabl)","",lineFinal[12])
+                                lineFinal.insert(8,re.search("(?<=ema)[a-zA-Z0-9_]+?(?=_emaw)",lineFinal[8]).group(0))
+                                lineFinal[9]=re.sub("\A[a-zA-Z0-9_]+?(?=emaw)","",lineFinal[9])
 
-                            lineFinal.insert(12,re.search("(?<=wabl)[a-zA-Z0-9_]+?(?=_wablm)",lineFinal[12]).group(0))
-                            lineFinal[13]=re.sub("\A[a-zA-Z0-9_]+?(?=wablm)","",lineFinal[13])
+                                lineFinal.insert(9,re.search("(?<=emaw)[a-zA-Z0-9_]+?(?=_emas)",lineFinal[9]).group(0))
+                                lineFinal[10]=re.sub("\A[a-zA-Z0-9_]+?(?=emas)","",lineFinal[10])
 
-                            lineFinal.insert(13,re.search("(?<=wablm)[a-zA-Z0-9_]+?(?=_rawl)",lineFinal[13]).group(0))
-                            lineFinal[14]=re.sub("\A[a-zA-Z0-9_]+?(?=rawl)","",lineFinal[14])
+                                lineFinal.insert(10,re.search("(?<=emas)[a-zA-Z0-9_]+?(?=_emap)",lineFinal[10]).group(0))
+                                lineFinal[11]=re.sub("\A[a-zA-Z0-9_]+?(?=emap)","",lineFinal[11])
 
-                            lineFinal.insert(14,re.search("(?<=rawl)[a-zA-Z0-9_]+?(?=_rawlm)",lineFinal[14]).group(0))
-                            lineFinal[15]=re.sub("\A[a-zA-Z0-9_]+?(?=rawlm)","",lineFinal[15])
+                                lineFinal.insert(11,re.search("(?<=emap)[a-zA-Z0-9_]+?(?=_wabl)",lineFinal[11]).group(0))
+                                lineFinal[12]=re.sub("\A[a-zA-Z0-9_]+?(?=wabl)","",lineFinal[12])
 
-                            lineFinal.insert(15,re.search("(?<=rawlm)[a-zA-Z0-9_]+?(?=_ken)",lineFinal[15]).group(0))
-                            lineFinal[16]=re.sub("\A[a-zA-Z0-9_]+?(?=ken)","",lineFinal[16])
+                                lineFinal.insert(12,re.search("(?<=wabl)[a-zA-Z0-9_]+?(?=_wablm)",lineFinal[12]).group(0))
+                                lineFinal[13]=re.sub("\A[a-zA-Z0-9_]+?(?=wablm)","",lineFinal[13])
 
-                            lineFinal.insert(16,re.search("(?<=ken)[a-zA-Z0-9_]+?(?=_vddpe)",lineFinal[16]).group(0))
-                            lineFinal[17]=re.sub("\A[a-zA-Z0-9_]+?(?=vddpe)","",lineFinal[17])
+                                lineFinal.insert(13,re.search("(?<=wablm)[a-zA-Z0-9_]+?(?=_rawl)",lineFinal[13]).group(0))
+                                lineFinal[14]=re.sub("\A[a-zA-Z0-9_]+?(?=rawl)","",lineFinal[14])
 
-                            self.memYdData.append(lineFinal)
+                                lineFinal.insert(14,re.search("(?<=rawl)[a-zA-Z0-9_]+?(?=_rawlm)",lineFinal[14]).group(0))
+                                lineFinal[15]=re.sub("\A[a-zA-Z0-9_]+?(?=rawlm)","",lineFinal[15])
+
+                                lineFinal.insert(15,re.search("(?<=rawlm)[a-zA-Z0-9_]+?(?=_ken)",lineFinal[15]).group(0))
+                                lineFinal[16]=re.sub("\A[a-zA-Z0-9_]+?(?=ken)","",lineFinal[16])
+
+                                lineFinal.insert(16,re.search("(?<=ken)[a-zA-Z0-9_]+?(?=_vddpe)",lineFinal[16]).group(0))
+                                lineFinal[17]=re.sub("\A[a-zA-Z0-9_]+?(?=vddpe)","",lineFinal[17])
+
+                                lineFinal.append(0)
+
+                                self.memYdData.append(lineFinal)
+                                self.allLines.append(lineFinal)
                         if(re.search("\A[0-9]+,tb_vmin_ckb",lineTemp) or (vminAutoShmooFlag is 1)):
+                            match=1
+                            failedCheckFlag=0
                             if(firstAutoVminFlag is 0):
                                 firstAutoVminFlag = 1
                                 tempList = ["Test_Number","Test","A/S","Location_Type(Catagory)","Test(META???)","Location_Type","Test_Location","??","EMA#1","EMA#2","EMAW","EMAS","EMAP","WABL","WABLM","RAWL","RAWLM","KEN","RANGE","Value","Test_Type(Shmoo)","Location_Type(Shmoo)","Test_Location(Shmoo)","??(Shmoo)","EMA#1(Shmoo)","EMA#2(Shmoo)","EMAW(Shmoo)","EMAS(Shmoo)","EMAP(Shmoo)","WABL(Shmoo)","WABLM(Shmoo)","RAWL(Shmoo)","RAWLM(Shmoo)","KEN(Shmoo)","Value(Shmoo)"]
                                 self.vminAutoData.append(tempList)
+                                self.allLines.append(tempList)
 
                             if(re.search("\A[0-9]+,tb_vmin_ckb",lineTemp)):
                                 vminAutoShmooFlag=1
@@ -238,6 +276,7 @@ class test1_:
                                 lineFinal[18]=re.sub("\A[a-zA-Z0-9_]+?(?=vddpe)","",lineFinal[18])
 
                                 self.vminAutoData.append(lineFinal)
+                                self.allLines.append(lineFinal)
                             else:
                                 vminAutoShmooFlag=0
 
@@ -285,8 +324,11 @@ class test1_:
                                 lineFinal[13]=re.sub("\A[a-zA-Z0-9_]+?(?=ken)","",lineFinal[13])
 
                                 self.vminAutoData[len(self.vminAutoData)-1].extend(lineFinal)
-                else:
-                    self.throwawayData.append(lineFinal)
+                                self.allLines[len(self.allLines)-1].extend(lineFinal)
+
+                        if(match==0):
+                            self.throwawayData.append(lineFinal)
+                        match=0
 
 
 

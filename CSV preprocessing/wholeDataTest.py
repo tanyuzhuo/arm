@@ -1,11 +1,12 @@
 import txtToCsv
 import os
 import re
+import datetime
 
 class fileToParse:
     def __init__(self,_topPath,_section,_fileName,_index,_degrees):
         self.filePath = _topPath+"/"+_section+"/"+_fileName
-        self.folderPath = "results/"+_topPath+"/"+_section+"/"+_fileName[-4:]
+        self.folderPath = "results/"+_topPath+"/"+_section+"/"+_fileName[:-4]
         self.topPath = _topPath
         self.section = _section
         self.fileName = _fileName
@@ -33,7 +34,19 @@ for type in fileTypes:
                     degrees = re.search("[M0-9]+(?=C.txt\Z)",fileName).group(0)
                 allFiles.append(fileToParse(direcOfFiles,type,fileName,index,degrees))
 
-#for file in allFiles:
-file = allFiles[0]
-print("making file for path "+file.filePath+" with destination "+file.folderPath)
-txtToCsvClass.makeAllCSVs(file.filePath,file.folderPath)
+startTime = datetime.datetime.now()
+counter=0
+averageTestTime=startTime-startTime
+for file  in allFiles[:5]:
+    try:
+        startTestTime = datetime.datetime.now()
+        txtToCsvClass.makeAllCSVs(file.filePath,file.folderPath)
+        testTime = datetime.datetime.now()-startTestTime
+        counter+=1
+        print("File #"+str(counter)+" \""+file.fileName+"\" with time = "+str(testTime))
+        averageTestTime += testTime
+    except AttributeError as error:
+        print(str(error)+" lines in file "+file.fileName+" were not created")
+averageTestTime /= counter
+endTime=datetime.datetime.now()
+print("All conversions complete with avgTst = "+str(averageTestTime))

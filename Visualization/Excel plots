@@ -1,0 +1,33 @@
+SC Yield:
+Data required: 
+    • File name -> Temperature and Split
+    • tb_sc_yd_vmin_shm -> Library name, voltage (vdd) value, test frequency, P/F
+Expected output:
+    • Title -> Voltage and Temperature (since libraries are common over different splits)
+    • X-axis -> Different libraries
+    • Y-axis -> Yield %
+    • Of course, each split has its own line on the plot
+    • There are 20 parts tested for each split -> One failure leads to a 5% decrement
+
+SC Vmin:
+Data required:
+    • File name -> Temperature and Split
+    • shmoo_bsmin_vec_stdcell -> Library name, vmin value
+    • Operating spec
+Expected output:
+    • Title -> Library and Temperature
+    • X-axis -> vdd (corresponding to vmin values)
+    • Y-axis -> Probability of pass
+    • One line per split on the graph
+
+SC Shmoo data:
+Data required:
+    • Title -> Process and Temperature
+    • shmoo_bsmin_vec_stdcell -> vmin for passing
+Expected output:
+    • Table with visual representation of threshold (i.e. smaller than vmin leads to failure, and hopefully larger than vmin implies passing)
+
+Rest:
+Missing data?
+
+Memory: yield and vmin plot, same as for SC.

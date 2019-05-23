@@ -28,6 +28,6 @@ Expected output:
     • Table with visual representation of threshold (i.e. smaller than vmin leads to failure, and hopefully larger than vmin implies passing)
 
 Rest:
-Missing data?
+Out of scope.
 
 Memory: yield and vmin plot, same as for SC.

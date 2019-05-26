@@ -37,7 +37,7 @@ for type in fileTypes:
 startTime = datetime.datetime.now()
 counter=0
 averageTestTime=startTime-startTime
-for file  in allFiles[:5]:
+for file  in allFiles:
     try:
         startTestTime = datetime.datetime.now()
         txtToCsvClass.makeAllCSVs(file.filePath,file.folderPath)

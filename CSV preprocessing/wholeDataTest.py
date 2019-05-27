@@ -27,28 +27,36 @@ for type in fileTypes:
         if(len(fileName)>4):
             if(fileName[-4:]==".txt"):
                 if(re.match("1st_",fileName)):
-                    index = re.search("(?<=1st_)[0-9]+?(?=_(TT|FF|FS|SF|SS))",fileName).group(0)
+                    print("fileName = "+fileName+" is invalid and will be ignored")
+                    #index = re.search("(?<=1st_)[0-9]+?(?=_(TT|FF|FS|SF|SS))",fileName).group(0)
                 else:
                     index = re.match("[0-9]+?(?=_(TT|FF|FS|SF|SS))",fileName).group(0)
-                if(re.search("_1.txt\Z",fileName)):
-                    degrees = re.search("[M0-9]+(?=C_1.txt\Z)",fileName).group(0)
-                else:
-                    degrees = re.search("[M0-9]+(?=C.txt\Z)",fileName).group(0)
-                allFiles.append(fileToParse(direcOfFiles,type,fileName,index,degrees))
+                    if(re.search("_1.txt\Z",fileName)):
+                        print("fileName = "+fileName+" is invalid and will be ignored")
+                        #degrees = re.search("[M0-9]+(?=C_1.txt\Z)",fileName).group(0)
+                    else:
+                        degrees = re.search("[M0-9]+(?=C.txt\Z)",fileName).group(0)
+                        allFiles.append(fileToParse(direcOfFiles,type,fileName,index,degrees))
 
 startTime = datetime.datetime.now()
 counter=0
 averageTestTime=startTime-startTime
-for file in allFiles:
-    try:
+for fileNumber,file in enumerate(allFiles, 1):
+    #try:
         startTestTime = datetime.datetime.now()
         #txtToCsvClass.makeAllCSVs(file.filePath,file.folderPath)
-        txtToOneCsvClass.output(file.filePath,file.folderPath)
+
+        #txtToOneCsvClass.output(file.filePath,"resultsOneFile")
+        if file.fileName =="121_TT_M40C.txt":
+            txtToOneCsvClass.outputOneFile(fileNumber,file.degrees,file.index,file.type,file.filePath,"resultsOneFile")
+
         testTime = datetime.datetime.now()-startTestTime
+        #print("file "+file.fileName+" in time = "+str(testTime))
         counter+=1
         averageTestTime += testTime
-    except AttributeError as error:
-        print(str(error)+" lines in file "+file.fileName+" were not created")
+    #except AttributeError as error:
+        #print(str(error)+" lines in file "+file.fileName+" were not created")
+
 print("Total test time = "+str(averageTestTime))
 averageTestTime /= counter
 endTime=datetime.datetime.now()

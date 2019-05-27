@@ -42,8 +42,8 @@ for fileNumber,file in enumerate(allFiles, 1):
     try:
         startTestTime = datetime.datetime.now()
 
-        #txtToCsvClass.output(file.filePath,"results")
-        txtToCsvClass.outputOneFile(fileNumber,file.degrees,file.index,file.type,file.filePath,"resultsOneFile")
+        txtToCsvClass.output(file.filePath,file.folderPath)
+        #txtToCsvClass.outputOneFile(fileNumber,file.degrees,file.index,file.type,file.filePath,"resultsOneFile")
 
         testTime = datetime.datetime.now()-startTestTime
         #print("file "+file.fileName+" in time = "+str(testTime))

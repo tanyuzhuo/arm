@@ -1,5 +1,4 @@
 import txtToCsv
-import txtToOneCsv
 import os
 import re
 import datetime
@@ -15,9 +14,7 @@ class fileToParse:
         self.index = _index
         self.degrees = _degrees
 
-
-#txtToCsvClass = txtToCsv.test1_()
-txtToOneCsvClass = txtToOneCsv.txtToCsv()
+txtToCsvClass = txtToCsv.txtToCsv()
 
 allFiles=[]
 fileTypes = ["TT","FF","FS","SF","SS"]
@@ -42,20 +39,18 @@ startTime = datetime.datetime.now()
 counter=0
 averageTestTime=startTime-startTime
 for fileNumber,file in enumerate(allFiles, 1):
-    #try:
+    try:
         startTestTime = datetime.datetime.now()
-        #txtToCsvClass.makeAllCSVs(file.filePath,file.folderPath)
 
-        #txtToOneCsvClass.output(file.filePath,"resultsOneFile")
-        if file.fileName =="121_TT_M40C.txt":
-            txtToOneCsvClass.outputOneFile(fileNumber,file.degrees,file.index,file.type,file.filePath,"resultsOneFile")
+        #txtToCsvClass.output(file.filePath,"results")
+        txtToCsvClass.outputOneFile(fileNumber,file.degrees,file.index,file.type,file.filePath,"resultsOneFile")
 
         testTime = datetime.datetime.now()-startTestTime
         #print("file "+file.fileName+" in time = "+str(testTime))
         counter+=1
         averageTestTime += testTime
-    #except AttributeError as error:
-        #print(str(error)+" lines in file "+file.fileName+" were not created")
+    except AttributeError as error:
+        print(str(error)+" lines in file "+file.fileName+" were not created")
 
 print("Total test time = "+str(averageTestTime))
 averageTestTime /= counter

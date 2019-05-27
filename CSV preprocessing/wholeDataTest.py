@@ -7,7 +7,7 @@ import datetime
 class fileToParse:
     def __init__(self,_topPath,_section,_fileName,_index,_degrees):
         self.filePath = _topPath+"/"+_section+"/"+_fileName
-        self.folderPath = "results1/"+_topPath+"/"+_section+"/"+_fileName[:-4]
+        self.folderPath = "results/"+_topPath+"/"+_section+"/"+_fileName[:-4]
         self.topPath = _topPath
         self.section = _section
         self.fileName = _fileName

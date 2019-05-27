@@ -15,12 +15,12 @@ class txtToCsv:
         self.leakageData=[]
         self.vminStdData=[]
         self.memData=[]
-        self.vminAutoData=[]
+        self.vminCkbData=[]
         #used to find the timing at the end of the file
         self.postMetaFlag=0
         #indicates section on last line
         self.lastLineSection=""
-        
+
         with open(inFilePath, 'r') as in_file:
             for line_number, line in enumerate(in_file, 1):
                 self.parseAnyLine(line,line_number)
@@ -60,9 +60,9 @@ class txtToCsv:
             elif re.match("[0-9]+?,tb_mem_yd_ckb",line) or (re.match("\([0-9]+?,pins\),FAILED",line) and self.lastLineSection=="mem"):
                 thisSection="mem"
                 self.parseMem(line,lineArray)
-            elif re.search("\A[0-9]+,tb_vmin_ckb",line) or (re.match("\([0-9]+?,pins\),FAILED",line) and self.lastLineSection=="vminAuto") or re.search("\Ashmoo_bsmin_vec(?!_stdcell_)",line):
-                thisSection="vminAuto"
-                self.parseVminAuto(line,lineArray)
+            elif re.search("\A[0-9]+,tb_vmin_ckb",line) or (re.match("\([0-9]+?,pins\),FAILED",line) and self.lastLineSection=="vminCkb") or re.search("\Ashmoo_bsmin_vec(?!_stdcell_)",line):
+                thisSection="vminCkb"
+                self.parseVminCkb(line,lineArray)
             else:
                 if(not re.match("TstNum,Pin,Chn",line)):
                     thisSection=""
@@ -214,11 +214,11 @@ class txtToCsv:
             lineArray.append("0")
 
         self.memData.append(lineArray)
-    def parseVminAuto(self,line,lineArray):
-        if self.lastLineSection is not "vminAuto":
-            self.vminAutoData.append(["Test Number","A/S","Arch. Type","Architecture","Test Location META","??","EMA#1","EMA#2","EMAW","EMAS","EMAP","WABL","WABLM","RAWL","RAWLM","KEN","VDDPE (Range)","VDDCE (Range)","DVDD (Range)","Period (Range)","Value","Shmoo Value","Number of Failed Pins","Failed Pins"])
+    def parseVminCkb(self,line,lineArray):
+        if self.lastLineSection is not "vminCkb":
+            self.vminCkbData.append(["Test Number","A/S","Arch. Type","Architecture","Test Location META","??","EMA#1","EMA#2","EMAW","EMAS","EMAP","WABL","WABLM","RAWL","RAWLM","KEN","VDDPE (Range)","VDDCE (Range)","DVDD (Range)","Period (Range)","Value","Shmoo Value","Number of Failed Pins","Failed Pins"])
         if re.search("\Ashmoo_bsmin_vec",line):
-            self.vminAutoData[len(self.vminAutoData)-1].insert(21,lineArray[1])
+            self.vminCkbData[len(self.vminCkbData)-1].insert(21,lineArray[1])
             return
         if re.match("\([0-9]+?,pins\),FAILED",line):
             tempList = []
@@ -230,7 +230,7 @@ class txtToCsv:
                 else:
                     tempList[1]=tempList[1]+" "+lineArray[counter]
                 counter+=1
-            self.vminAutoData[len(self.vminAutoData)-1].extend(tempList)
+            self.vminCkbData[len(self.vminCkbData)-1].extend(tempList)
             return
 
         if re.search("\Ashmoo_bsmin_vec",line):
@@ -270,7 +270,7 @@ class txtToCsv:
         if(lineArray[20]=="(P)"):
             lineArray.append("0")
 
-        self.vminAutoData.append(lineArray)
+        self.vminCkbData.append(lineArray)
 
 
 
@@ -306,10 +306,10 @@ class txtToCsv:
             #writes csv file from list
             writer = csv.writer(out_file5)
             writer.writerows(self.memData)
-        with open(filePath+"/vminAuto.csv", "w") as out_file6:
+        with open(filePath+"/vminCkb.csv", "w") as out_file6:
             #writes csv file from list
             writer = csv.writer(out_file6)
-            writer.writerows(self.vminAutoData)
+            writer.writerows(self.vminCkbData)
         with open(filePath+"/meta.csv", "w") as out_file7:
             #writes csv file from list
             writer = csv.writer(out_file7)
@@ -320,7 +320,7 @@ class txtToCsv:
             writer.writerows(self.leakageData)
             writer.writerows(self.vminStdData)
             writer.writerows(self.memData)
-            writer.writerows(self.vminAutoData)
+            writer.writerows(self.vminCkbData)
             writer.writerows(self.metaData)
 
 

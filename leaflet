@@ -1,17 +1,19 @@
-Intro -> Identify problem and cilent needs:
-
-
-
+Intro -> Identify problem and client needs:
+  - Problem -> inefficient process:
+    -> individual perl scripts demand a lot of work to extract data
+    -> convoluted process to obtain graphs, requires excel VBA
+    -> difficult navigation through the files since all is done through perl and excel
+    
 The Solution -> Proposed Concept:
 
-Data Preprocessing:
+  - Data Preprocessing:
 
 
-PyQT5:
+  - PyQT5:
 
 
-Data Science:
+  - Data Science:
+    -> Uncover correlations between parameters in the data (e.g. using Analysis of Variance (ANOVA))
+    -> Visually display relationships (e.g. using correlation matrices, group boxplots)
 
-
-Selling Point:
-
+  - Selling Point:

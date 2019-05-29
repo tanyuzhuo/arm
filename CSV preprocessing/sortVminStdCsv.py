@@ -28,5 +28,7 @@ final_data2 = final_data.sort_values(by=['File Index', 'Chip Temp', 'Test Item',
 
 print(final_data2.head())
 print(final_data2['Test Item'].value_counts())
+print(final_data2['Chip Type'].value_counts())
+print(final_data2['Chip Temp'].value_counts())
 
 final_data2.to_csv('sortedVminStd.csv', index=False, mode='w')

@@ -36,6 +36,8 @@ class txtToCsv:
         lineArray = line.split(",")
 
         #checks not an empty line
+        #if(re.search("F_F",line) or re.search("S_S",line) or re.search("f_f",line)):
+            #print("found in file temp "+self.fileTemp+" index "+self.fileIndex+" and type "+self.fileType)
         if not re.search("^$",line):
             thisSection=""
             #checks meta data so it can
@@ -75,9 +77,14 @@ class txtToCsv:
     def parsePin(self,line,lineArray):
         if(self.lastLineSection!="pins"):
             if self.fileCount is 1:
-                self.pinsData.append(["File Index","Chip Type","Chip Temp","TstNum","Pin","Chn","Pin Name","Test Block","Test Name","Force Value","Low Limit","Test Value","P/F","High Limit"])
-            if self.fileCount is -1:
-                self.pinsData.append(["TstNum","Pin","Chn","Pin Name","Test Block","Test Name","Force Value","Low Limit","Test Value","P/F","High Limit"])
+                header = ["TstNum","Pin","Chn","Pin Name","Test Block","Test Name","Force Value","Low Limit","Test Value","P/F","High Limit"]
+                if self.outputForm is 3:
+                    header = ["Chip Type","Chip Temp","File Index"]+header
+                if self.outputForm is 2:
+                    header = ["Chip Type","Chip Temp"]+header
+                if self.outputForm is 1:
+                    header = ["Chip Type"]+header
+                self.pinsData.append(header)
         units=["uA","mV","mA","uA","pV","V"]
         if(lineArray[5]=="Cont"):
             lineArray[5]="Cont N"
@@ -120,15 +127,24 @@ class txtToCsv:
                 continue
             break
 
-        if self.fileCount is not -1:
-            lineArray=[self.fileIndex,self.fileType,self.fileTemp]+lineArray
+        if self.outputForm is 3:
+            lineArray=[self.fileType,self.fileTemp,self.fileIndex]+lineArray
+        if self.outputForm is 2:
+            lineArray=[self.fileType,self.fileTemp]+lineArray
+        if self.outputForm is 1:
+            lineArray=[self.fileType]+lineArray
         self.pinsData.append(lineArray)
     def parseLeakage(self,line,lineArray):
         if self.lastLineSection != "leakage":
             if self.fileCount is 1:
-                self.leakageData.append(["File Index","Chip Type","Chip Temp","Leakage Test Type","Pin","VDD (Range)","DVDD (Range)","Period (Range)","Value"])
-            if self.fileCount is -1:
-                self.leakageData.append(["Leakage Test Type","Pin","VDD (Range)","DVDD (Range)","Period (Range)","Value"])
+                header = ["Leakage Test Type","Pin","VDD (Range)","DVDD (Range)","Period (Range)","Value"]
+                if self.outputForm is 3:
+                    header = ["Chip Type","Chip Temp","File Index"]+header
+                if self.outputForm is 2:
+                    header = ["Chip Type","Chip Temp"]+header
+                if self.outputForm is 1:
+                    header = ["Chip Type"]+header
+                self.leakageData.append(header)
 
         if lineArray[0] == "tb_leakage_high":
             lineArray[0]="high"
@@ -144,15 +160,24 @@ class txtToCsv:
             lineArray[5]+=" uA"
             lineArray.pop(6)
 
-        if self.fileCount is not -1:
-            lineArray=[self.fileIndex,self.fileType,self.fileTemp]+lineArray
+        if self.outputForm is 3:
+            lineArray=[self.fileType,self.fileTemp,self.fileIndex]+lineArray
+        if self.outputForm is 2:
+            lineArray=[self.fileType,self.fileTemp]+lineArray
+        if self.outputForm is 1:
+            lineArray=[self.fileType]+lineArray
         self.leakageData.append(lineArray)
     def parseVminStd(self,line,lineArray):
         if self.lastLineSection is not "vminStd":
             if self.fileCount is 1:
-                self.vminStdData.append(["File Index","Chip Type","Chip Temp","Test Number","Test Item","Library #1","Library #2","Library #3","VDD (Range)","DVDD (Range)","Period (Range)","Result","Shmoo Value"])
-            if self.fileCount is -1:
-                self.vminStdData.append(["Test Number","Test Item","Library #1","Library #2","Library #3","VDD (Range)","DVDD (Range)","Period (Range)","Result","Shmoo Value"])
+                header = ["Test Number","Test Item","Library #1","Library #2","Library #3","VDD (Range)","DVDD (Range)","Period (Range)","Result","Shmoo Value"]
+                if self.outputForm is 3:
+                    header = ["Chip Type","Chip Temp","File Index"]+header
+                if self.outputForm is 2:
+                    header = ["Chip Type","Chip Temp"]+header
+                if self.outputForm is 1:
+                    header = ["Chip Type"]+header
+                self.vminStdData.append(header)
         if re.search("\Ashmoo_bsmin_vec_stdcell_",line):
             self.vminStdData[len(self.vminStdData)-1].append(lineArray[1])
             return
@@ -179,15 +204,24 @@ class txtToCsv:
 
         lineArray[7]=re.search("(?<=_)[-0-9.]+(?=nS\Z)",lineArray[7]).group(0)+" ns"
 
-        if self.fileCount is not -1:
-            lineArray=[self.fileIndex,self.fileType,self.fileTemp]+lineArray
+        if self.outputForm is 3:
+            lineArray=[self.fileType,self.fileTemp,self.fileIndex]+lineArray
+        if self.outputForm is 2:
+            lineArray=[self.fileType,self.fileTemp]+lineArray
+        if self.outputForm is 1:
+            lineArray=[self.fileType]+lineArray
         self.vminStdData.append(lineArray)
     def parseMem(self,line,lineArray):
         if self.lastLineSection is not "mem":
             if self.fileCount is 1:
-                self.memData.append(["File Index","Chip Type","Chip Temp","Test Number","A/S","R/F","Architecture","Test Location META","??","EMA#1","EMA#2","EMAW","EMAS","EMAP","WABL","WABLM","RAWL","RAWLM","KEN","VDDPE (Range)","VDDCE (Range)","DVDD (Range)","Period (Range)","Value","Number of Failed Pins","Failed Pins"])
-            if self.fileCount is -1:
-                self.memData.append(["Test Number","A/S","R/F","Architecture","Test Location META","??","EMA#1","EMA#2","EMAW","EMAS","EMAP","WABL","WABLM","RAWL","RAWLM","KEN","VDDPE (Range)","VDDCE (Range)","DVDD (Range)","Period (Range)","Value","Number of Failed Pins","Failed Pins"])
+                header = ["Test Number","A/S","R/F","Architecture","Test Location META","??","EMA#1","EMA#2","EMAW","EMAS","EMAP","WABL","WABLM","RAWL","RAWLM","KEN","VDDPE (Range)","VDDCE (Range)","DVDD (Range)","Period (Range)","Value","Number of Failed Pins","Failed Pins"]
+                if self.outputForm is 3:
+                    header = ["Chip Type","Chip Temp","File Index"]+header
+                if self.outputForm is 2:
+                    header = ["Chip Type","Chip Temp"]+header
+                if self.outputForm is 1:
+                    header = ["Chip Type"]+header
+                self.memData.append(header)
         if re.match("\([0-9]+?,pins\),FAILED",line):
             tempList = []
             tempList.append(lineArray[0][1:])
@@ -233,15 +267,24 @@ class txtToCsv:
         if(lineArray[20]=="(P)"):
             lineArray.append("0")
 
-        if self.fileCount is not -1:
-            lineArray=[self.fileIndex,self.fileType,self.fileTemp]+lineArray
+        if self.outputForm is 3:
+            lineArray=[self.fileType,self.fileTemp,self.fileIndex]+lineArray
+        if self.outputForm is 2:
+            lineArray=[self.fileType,self.fileTemp]+lineArray
+        if self.outputForm is 1:
+            lineArray=[self.fileType]+lineArray
         self.memData.append(lineArray)
     def parseVminCkb(self,line,lineArray):
         if self.lastLineSection is not "vminCkb":
             if self.fileCount is 1:
-                self.vminCkbData.append(["File Index","Chip Type","Chip Temp","Test Number","A/S","Arch. Type","Architecture","Test Location META","??","EMA#1","EMA#2","EMAW","EMAS","EMAP","WABL","WABLM","RAWL","RAWLM","KEN","VDDPE (Range)","VDDCE (Range)","DVDD (Range)","Period (Range)","Value","Shmoo Value","Number of Failed Pins","Failed Pins"])
-            if self.fileCount is -1:
-                self.vminCkbData.append(["Test Number","A/S","Arch. Type","Architecture","Test Location META","??","EMA#1","EMA#2","EMAW","EMAS","EMAP","WABL","WABLM","RAWL","RAWLM","KEN","VDDPE (Range)","VDDCE (Range)","DVDD (Range)","Period (Range)","Value","Shmoo Value","Number of Failed Pins","Failed Pins"])
+                header = ["Test Number","A/S","Arch. Type","Architecture","Test Location META","??","EMA#1","EMA#2","EMAW","EMAS","EMAP","WABL","WABLM","RAWL","RAWLM","KEN","VDDPE (Range)","VDDCE (Range)","DVDD (Range)","Period (Range)","Value","Shmoo Value","Number of Failed Pins","Failed Pins"]
+                if self.outputForm is 3:
+                    header = ["Chip Type","Chip Temp","File Index"]+header
+                if self.outputForm is 2:
+                    header = ["Chip Type","Chip Temp"]+header
+                if self.outputForm is 1:
+                    header = ["Chip Type"]+header
+                self.vminCkbData.append(header)
         if re.match("\([0-9]+?,pins\),FAILED",line):
             tempList = []
             tempList.append(lineArray[0][1:])
@@ -255,7 +298,7 @@ class txtToCsv:
             self.vminCkbData[len(self.vminCkbData)-1].extend(tempList)
             return
         if re.search("\Ashmoo_bsmin_vec",line):
-            self.vminCkbData[len(self.vminCkbData)-1].append(lineArray[1])
+            self.vminCkbData[len(self.vminCkbData)-1][24] = lineArray[1]
             return
         lineArray.insert(1,re.search("[a-zA-Z]+(?=_[a-zA-Z0-9]+\Z)",lineArray[1]).group(0))
         lineArray[2]=re.search("(?<=_)[a-zA-Z0-9]+\Z",lineArray[2]).group(0)
@@ -286,18 +329,28 @@ class txtToCsv:
         lineArray.insert(18,re.search("(?<=_dvdd_)[\-\.a-zA-Z0-9]+?(?=V_)",lineArray[18]).group(0)+" V")
         lineArray[19]=re.search("(?<=_)[\-\.a-zA-Z0-9]+?(?=ns\Z)",lineArray[19]).group(0)+" ns"
 
+        lineArray.append("")
         if(lineArray[20]=="(P)"):
             lineArray.append("0")
 
-        if self.fileCount is not -1:
-            lineArray=[self.fileIndex,self.fileType,self.fileTemp]+lineArray
+        if self.outputForm is 3:
+            lineArray=[self.fileType,self.fileTemp,self.fileIndex]+lineArray
+        if self.outputForm is 2:
+            lineArray=[self.fileType,self.fileTemp]+lineArray
+        if self.outputForm is 1:
+            lineArray=[self.fileType]+lineArray
         self.vminCkbData.append(lineArray)
     def parseShmoo(self,line,lineArray):
         if self.lastLineSection is not "shmoo":
             if self.fileCount is 1:
-                self.shmooData.append(["File Index","Chip Type","Chip Temp","Test Number","A/S","Arch. Type","Architecture","Test Location META","??","EMA#1","EMA#2","EMAW","EMAS","EMAP","WABL","WABLM","RAWL","RAWLM","KEN","VDDPE (Range)","VDDCE (Range)","DVDD (Range)","Period (Range)","Value","Shmoo Value","Number of Failed Pins","Failed Pins"])
-            if self.fileCount is -1:
-                self.shmooData.append(["Test Number","A/S","Arch. Type","Architecture","Test Location META","??","EMA#1","EMA#2","EMAW","EMAS","EMAP","WABL","WABLM","RAWL","RAWLM","KEN","VDDPE (Range)","VDDCE (Range)","DVDD (Range)","Period (Range)","Value","Shmoo Value","Number of Failed Pins","Failed Pins"])
+                header = ["Test Number","A/S","Arch. Type","Architecture","Test Location META","??","EMA#1","EMA#2","EMAW","EMAS","EMAP","WABL","WABLM","RAWL","RAWLM","KEN","VDDPE (Range)","VDDCE (Range)","DVDD (Range)","Period (Range)","Value","Shmoo Value","Number of Failed Pins","Failed Pins"]
+                if self.outputForm is 3:
+                    header = ["Chip Type","Chip Temp","File Index"]+header
+                if self.outputForm is 2:
+                    header = ["Chip Type","Chip Temp"]+header
+                if self.outputForm is 1:
+                    header = ["Chip Type"]+header
+                self.shmooData.append(header)
         if re.match("\([0-9]+?,pins\),FAILED",line):
             tempList = []
             tempList.append(lineArray[0][1:])
@@ -337,123 +390,88 @@ class txtToCsv:
         lineArray.insert(11,re.search("(?<=_rawlm)[a-zA-Z0-9]+?(?=_ken)",lineArray[11]).group(0))
         lineArray[12]=re.search("(?<=_ken)[a-zA-Z0-9]+?\Z",lineArray[12]).group(0)
 
-        if self.fileCount is not -1:
-            lineArray=[self.fileIndex,self.fileType,self.fileTemp]+lineArray
+        if self.outputForm is 3:
+            lineArray=[self.fileType,self.fileTemp,self.fileIndex]+lineArray
+        if self.outputForm is 2:
+            lineArray=[self.fileType,self.fileTemp]+lineArray
+        if self.outputForm is 1:
+            lineArray=[self.fileType]+lineArray
         self.shmooData.append(lineArray)
 
     def makeDir(self,path):
         if not os.path.exists(path):
             os.makedirs(path)
 
-    def output(self,inFilePath="Temp Folder/101_TT_25C.txt",filePath="this file"):
-        self.fileCount=-1
-        self.fileTemp=""
-        self.fileIndex=""
-        self.fileType=""
-        #opens output file
-        self.processFileLines(inFilePath)
-        self.makeDir(filePath)
-        with open(filePath+"/unused.csv", "w") as out_file1:
-            #writes csv file from list
-            writer = csv.writer(out_file1)
-            writer.writerows(self.unusedData)
-            throwawayDataSize=len(self.unusedData)
-            if(throwawayDataSize>0):
-                print("file \""+filePath+"\".txt has "+str(throwawayDataSize)+" unrecognized lines")
-        with open(filePath+"/pins.csv", "w") as out_file2:
-            #writes csv file from list
-            writer = csv.writer(out_file2)
-            writer.writerows(self.pinsData)
-        with open(filePath+"/leakage.csv", "w") as out_file3:
-            #writes csv file from list
-            writer = csv.writer(out_file3)
-            writer.writerows(self.leakageData)
-        with open(filePath+"/vminStd.csv", "w") as out_file4:
-            #writes csv file from list
-            writer = csv.writer(out_file4)
-            writer.writerows(self.vminStdData)
-        with open(filePath+"/mem.csv", "w") as out_file5:
-            #writes csv file from list
-            writer = csv.writer(out_file5)
-            writer.writerows(self.memData)
-        with open(filePath+"/vminCkb.csv", "w") as out_file6:
-            #writes csv file from list
-            writer = csv.writer(out_file6)
-            writer.writerows(self.vminCkbData)
-        with open(filePath+"/shmoo.csv", "w") as out_file7:
-            #writes csv file from list
-            writer = csv.writer(out_file7)
-            writer.writerows(self.shmooData)
-        with open(filePath+"/meta.csv", "w") as out_file8:
-            #writes csv file from list
-            writer = csv.writer(out_file8)
-            writer.writerows(self.metaData)
-        with open(filePath+"/fullOutput.csv", "w") as out_file9:
-            writer = csv.writer(out_file9)
-            writer.writerows(self.pinsData)
-            writer.writerows(self.leakageData)
-            writer.writerows(self.vminStdData)
-            writer.writerows(self.memData)
-            writer.writerows(self.vminCkbData)
-            writer.writerows(self.shmooData)
-            writer.writerows(self.metaData)
-
-    def outputOneFile(self,fileCount,fileTemp,fileIndex,fileType,inFilePath="Temp Folder/101_TT_25C.txt",filePath="this file"):
-        #opens output file
+    def output(self,outputForm,fileCount,fileTemp,fileIndex,fileType,inFilePath,filePath="default"):
+        self.outputForm=outputForm
         self.fileCount=fileCount
-        self.fileTemp=fileTemp
-        self.fileIndex=fileIndex
-        self.fileType=fileType
+        if self.outputForm is 3:
+            self.fileTemp=fileTemp
+            self.fileIndex=fileIndex
+            self.fileType=fileType
+        if self.outputForm is 2:
+            self.fileTemp=fileTemp
+            self.fileIndex=""
+            self.fileType=fileType
+        if self.outputForm is 1:
+            self.fileTemp=""
+            self.fileIndex=""
+            self.fileType=fileType
+        if self.outputForm is 0:
+            self.fileTemp=""
+            self.fileIndex=""
+            self.fileType=""
+
         self.processFileLines(inFilePath)
         self.makeDir(filePath)
-        with open(filePath+"/unused.csv", "a") as out_file1:
+        writeAppend = "a"
+
+        if self.fileCount is 1:
+            writeAppend = "w"
+
+        with open(filePath+"/unused.csv", writeAppend) as out_file1:
             #writes csv file from list
             writer = csv.writer(out_file1)
             writer.writerows(self.unusedData)
             throwawayDataSize=len(self.unusedData)
             if(throwawayDataSize>0):
                 print("file \""+filePath+"\".txt has "+str(throwawayDataSize)+" unrecognized lines")
-        with open(filePath+"/pins.csv", "a") as out_file2:
+        with open(filePath+"/pins.csv", writeAppend) as out_file2:
             #writes csv file from list
             writer = csv.writer(out_file2)
             writer.writerows(self.pinsData)
-        with open(filePath+"/leakage.csv", "a") as out_file3:
+        with open(filePath+"/leakage.csv", writeAppend) as out_file3:
             #writes csv file from list
             writer = csv.writer(out_file3)
             writer.writerows(self.leakageData)
-        with open(filePath+"/vminStd.csv", "a") as out_file4:
+        with open(filePath+"/vminStd.csv", writeAppend) as out_file4:
             #writes csv file from list
             writer = csv.writer(out_file4)
             writer.writerows(self.vminStdData)
-        with open(filePath+"/mem.csv", "a") as out_file5:
+        with open(filePath+"/mem.csv", writeAppend) as out_file5:
             #writes csv file from list
             writer = csv.writer(out_file5)
             writer.writerows(self.memData)
-        with open(filePath+"/vminCkb.csv", "a") as out_file6:
+        with open(filePath+"/vminCkb.csv", writeAppend) as out_file6:
             #writes csv file from list
             writer = csv.writer(out_file6)
             writer.writerows(self.vminCkbData)
-        with open(filePath+"/shmoo.csv", "w") as out_file7:
+        with open(filePath+"/shmoo.csv", writeAppend) as out_file7:
             #writes csv file from list
             writer = csv.writer(out_file7)
             writer.writerows(self.shmooData)
-        with open(filePath+"/meta.csv", "a") as out_file7:
+        with open(filePath+"/meta.csv", writeAppend) as out_file7:
             #writes csv file from list
             writer = csv.writer(out_file7)
-            writer.writerows(self.metaData)
-        with open(filePath+"/fullOutput.csv", "a") as out_file8:
-            writer = csv.writer(out_file8)
-            writer.writerows(self.pinsData)
-            writer.writerows(self.leakageData)
-            writer.writerows(self.vminStdData)
-            writer.writerows(self.memData)
-            writer.writerows(self.vminCkbData)
-            writer.writerows(self.shmooData)
             writer.writerows(self.metaData)
 
-#startTime = datetime.datetime.now()
-#txtToCsv = txtToCsv()
-#txtToCsv.processFileLines("Temp Folder/101_TT_25C.txt")
-#txtToCsv.output()
-#endTime = datetime.datetime.now()
-#print(endTime-startTime)
+        #--------don't need fullOutput-------
+        #with open(filePath+"/fullOutput.csv", writeAppend) as out_file8:
+            #writer = csv.writer(out_file8)
+            #writer.writerows(self.pinsData)
+            #writer.writerows(self.leakageData)
+            #writer.writerows(self.vminStdData)
+            #writer.writerows(self.memData)
+            #writer.writerows(self.vminCkbData)
+            #writer.writerows(self.shmooData)
+            #writer.writerows(self.metaData)

@@ -170,7 +170,7 @@ class txtToCsv:
     def parseVminStd(self,line,lineArray):
         if self.lastLineSection is not "vminStd":
             if self.fileCount is 1:
-                header = ["Test Number","Test Item","Library #1","Library #2","Library #3","VDD (Range)","DVDD (Range)","Period (Range)","Result","Shmoo Value"]
+                header = ["Test Number","Test Item","VDD (Range)","DVDD (Range)","Period (Range)","Result","Shmoo Value"]
                 if self.outputForm is 3:
                     header = ["Chip Type","Chip Temp","File Index"]+header
                 if self.outputForm is 2:
@@ -179,30 +179,18 @@ class txtToCsv:
                     header = ["Chip Type"]+header
                 self.vminStdData.append(header)
         if re.search("\Ashmoo_bsmin_vec_stdcell_",line):
-            self.vminStdData[len(self.vminStdData)-1].append(lineArray[1])
+            self.vminStdData[len(self.vminStdData)-1].append(lineArray[1][:-1])
             return
 
         if lineArray[1]=="tb_sc_yd_vmin_shm":
             lineArray.pop(1)
-        else:
-            raise AttributeError("standard cell format not correct")
 
-        if lineArray[1][:17]!="func_vec_stdcell_":
-            raise AttributeError("standard cell format not correct")
+        lineArray.insert(1,re.search("(?<=stdcell_)[a-z0-9]+?_[a-z0-9]+?_[a-z0-9]+?_[a-z0-9]+?(?=_)",lineArray[1]).group(0))
 
-        lineArray.insert(1,re.search("(?<=stdcell_)[a-z0-9]+(?=_)",lineArray[1]).group(0))
-        lineArray[2]=re.sub("[a-zA-Z0-9_]+(stdcell_)[a-zA-Z0-9]+_","",lineArray[2])
+        lineArray.insert(2,re.search("(?<=vdd_)[\-0-9\.]+(?=V_dvdd)",lineArray[2]).group(0)+" V")
+        lineArray.insert(3,re.search("(?<=dvdd_)[\-0-9\.]+(?=V_)",lineArray[3]).group(0)+" V")
 
-        lineArray.insert(2,re.search("\A[a-z]+(?=_)",lineArray[2]).group(0))
-        lineArray[3]=re.sub("\A[a-z]+_","",lineArray[3])
-
-        lineArray.insert(3,re.search("\A[a-z0-9]+(?=_)",lineArray[3]).group(0))
-        lineArray.insert(4,re.search("(?<=_)[a-z0-9]+(?=_pattern)",lineArray[4]).group(0))
-
-        lineArray.insert(5,re.search("(?<=vdd_)[\-0-9\.]+(?=V_dvdd)",lineArray[5]).group(0)+" V")
-        lineArray.insert(6,re.search("(?<=dvdd_)[\-0-9\.]+(?=V_)",lineArray[6]).group(0)+" V")
-
-        lineArray[7]=re.search("(?<=_)[-0-9.]+(?=nS\Z)",lineArray[7]).group(0)+" ns"
+        lineArray[4]=re.search("(?<=_)[-0-9.]+(?=nS\Z)",lineArray[4]).group(0)+" ns"
 
         if self.outputForm is 3:
             lineArray=[self.fileType,self.fileTemp,self.fileIndex]+lineArray
@@ -214,7 +202,7 @@ class txtToCsv:
     def parseMem(self,line,lineArray):
         if self.lastLineSection is not "mem":
             if self.fileCount is 1:
-                header = ["Test Number","A/S","R/F","Architecture","Test Location META","??","EMA#1","EMA#2","EMAW","EMAS","EMAP","WABL","WABLM","RAWL","RAWLM","KEN","VDDPE (Range)","VDDCE (Range)","DVDD (Range)","Period (Range)","Value","Number of Failed Pins","Failed Pins"]
+                header = ["Test Number","A/S","R/F","Architecture","??","EMA#1","EMA#2","EMAW","EMAS","EMAP","WABL","WABLM","RAWL","RAWLM","KEN","VDDPE (Range)","VDDCE (Range)","DVDD (Range)","Period (Range)","Value","Number of Failed Pins","Failed Pins"]
                 if self.outputForm is 3:
                     header = ["Chip Type","Chip Temp","File Index"]+header
                 if self.outputForm is 2:
@@ -239,32 +227,29 @@ class txtToCsv:
         lineArray[2]=re.search("(?<=_)[A-Z]\Z",lineArray[2]).group(0)
 
         if re.search("(?<=\Afunc_vec_)[a-zA-Z0-9]+?(?=_)",lineArray[3]).group(0) == "cln16ffcll":
-            lineArray.insert(3,re.search("(?<=\Afunc_vec_)[a-zA-Z0-9_]+?(?=_w)",lineArray[3]).group(0))
-            lineArray[4]=re.sub("\Afunc_vec_[a-zA-Z0-9_]+?(?=w)","",lineArray[4])
+            lineArray.insert(3,re.search("(?<=\Afunc_vec_)[a-zA-Z0-9_]+?_[a-zA-Z0-9]+?_[a-zA-Z0-9]+?_[a-zA-Z0-9]+?(?=_)",lineArray[3]).group(0))
+            lineArray[4]=re.sub("\Afunc_vec_[a-zA-Z0-9_]+?_[a-zA-Z0-9]+?_[a-zA-Z0-9]+?_[a-zA-Z0-9]+?_","",lineArray[4])
         else:
-            lineArray.insert(3,re.search("(?<=\Afunc_vec_)[a-zA-Z0-9]+?(?=_)",lineArray[3]).group(0))
-            lineArray[4]=re.sub("\Afunc_vec_[a-zA-Z0-9]+?_","",lineArray[4])
+            lineArray.insert(3,re.search("(?<=\Afunc_vec_)[a-zA-Z0-9]+?_[a-zA-Z0-9]+?(?=_)",lineArray[3]).group(0))
+            lineArray[4]=re.sub("\Afunc_vec_[a-zA-Z0-9]+?_[a-zA-Z0-9]+?_","",lineArray[4])
 
-        lineArray.insert(4,re.match("[a-zA-Z0-9]+?(?=_)",lineArray[4]).group(0))
-        lineArray[5]=re.sub("\A[a-zA-Z0-9]+?_","",lineArray[5])
+        lineArray.insert(4,re.search("\A[a-zA-Z0-9_]+?(?=_ema)",lineArray[4]).group(0))
+        lineArray.insert(5,re.search("(?<=ema)[a-zA-Z0-9]+?(?=_ema)",lineArray[5]).group(0))
+        lineArray.insert(6,re.search("(?<=ema)[a-zA-Z0-9]+?(?=_emaw)",lineArray[6]).group(0))
+        lineArray.insert(7,re.search("(?<=_emaw)[a-zA-Z0-9]+?(?=_emas)",lineArray[7]).group(0))
+        lineArray.insert(8,re.search("(?<=_emas)[a-zA-Z0-9]+?(?=_emap)",lineArray[8]).group(0))
+        lineArray.insert(9,re.search("(?<=_emap)[a-zA-Z0-9]+?(?=_wabl)",lineArray[9]).group(0))
+        lineArray.insert(10,re.search("(?<=_wabl)[a-zA-Z0-9]+?(?=_wablm)",lineArray[10]).group(0))
+        lineArray.insert(11,re.search("(?<=_wablm)[a-zA-Z0-9]+?(?=_rawl)",lineArray[11]).group(0))
+        lineArray.insert(12,re.search("(?<=_rawl)[a-zA-Z0-9]+?(?=_rawlm)",lineArray[12]).group(0))
+        lineArray.insert(13,re.search("(?<=_rawlm)[a-zA-Z0-9]+?(?=_ken)",lineArray[13]).group(0))
+        lineArray.insert(14,re.search("(?<=_ken)[a-zA-Z0-9]+?(?=_vddpe)",lineArray[14]).group(0))
+        lineArray.insert(15,re.search("(?<=_vddpe_)[\-\..a-zA-Z0-9]+?(?=V_vddce)",lineArray[15]).group(0)+" V")
+        lineArray.insert(16,re.search("(?<=_vddce_)[\-\.a-zA-Z0-9]+?(?=V_dvdd)",lineArray[16]).group(0)+" V")
+        lineArray.insert(17,re.search("(?<=_dvdd_)[\-\.a-zA-Z0-9]+?(?=V_)",lineArray[17]).group(0)+" V")
+        lineArray[18]=re.search("(?<=_)[\-\.a-zA-Z0-9]+?(?=ns\Z)",lineArray[18]).group(0)+" ns"
 
-        lineArray.insert(5,re.search("\A[a-zA-Z0-9_]+?(?=_ema)",lineArray[5]).group(0))
-        lineArray.insert(6,re.search("(?<=ema)[a-zA-Z0-9]+?(?=_ema)",lineArray[6]).group(0))
-        lineArray.insert(7,re.search("(?<=ema)[a-zA-Z0-9]+?(?=_emaw)",lineArray[7]).group(0))
-        lineArray.insert(8,re.search("(?<=_emaw)[a-zA-Z0-9]+?(?=_emas)",lineArray[8]).group(0))
-        lineArray.insert(9,re.search("(?<=_emas)[a-zA-Z0-9]+?(?=_emap)",lineArray[9]).group(0))
-        lineArray.insert(10,re.search("(?<=_emap)[a-zA-Z0-9]+?(?=_wabl)",lineArray[10]).group(0))
-        lineArray.insert(11,re.search("(?<=_wabl)[a-zA-Z0-9]+?(?=_wablm)",lineArray[11]).group(0))
-        lineArray.insert(12,re.search("(?<=_wablm)[a-zA-Z0-9]+?(?=_rawl)",lineArray[12]).group(0))
-        lineArray.insert(13,re.search("(?<=_rawl)[a-zA-Z0-9]+?(?=_rawlm)",lineArray[13]).group(0))
-        lineArray.insert(14,re.search("(?<=_rawlm)[a-zA-Z0-9]+?(?=_ken)",lineArray[14]).group(0))
-        lineArray.insert(15,re.search("(?<=_ken)[a-zA-Z0-9]+?(?=_vddpe)",lineArray[15]).group(0))
-        lineArray.insert(16,re.search("(?<=_vddpe_)[\-\..a-zA-Z0-9]+?(?=V_vddce)",lineArray[16]).group(0)+" V")
-        lineArray.insert(17,re.search("(?<=_vddce_)[\-\.a-zA-Z0-9]+?(?=V_dvdd)",lineArray[17]).group(0)+" V")
-        lineArray.insert(18,re.search("(?<=_dvdd_)[\-\.a-zA-Z0-9]+?(?=V_)",lineArray[18]).group(0)+" V")
-        lineArray[19]=re.search("(?<=_)[\-\.a-zA-Z0-9]+?(?=ns\Z)",lineArray[19]).group(0)+" ns"
-
-        if(lineArray[20]=="(P)"):
+        if(lineArray[19]=="(P)"):
             lineArray.append("0")
 
         if self.outputForm is 3:
@@ -277,7 +262,7 @@ class txtToCsv:
     def parseVminCkb(self,line,lineArray):
         if self.lastLineSection is not "vminCkb":
             if self.fileCount is 1:
-                header = ["Test Number","A/S","Arch. Type","Architecture","Test Location META","??","EMA#1","EMA#2","EMAW","EMAS","EMAP","WABL","WABLM","RAWL","RAWLM","KEN","VDDPE (Range)","VDDCE (Range)","DVDD (Range)","Period (Range)","Value","Shmoo Value","Number of Failed Pins","Failed Pins"]
+                header = ["Test Number","A/S","Arch. Type","Architecture","??","EMA#1","EMA#2","EMAW","EMAS","EMAP","WABL","WABLM","RAWL","RAWLM","KEN","VDDPE (Range)","VDDCE (Range)","DVDD (Range)","Period (Range)","Value","Shmoo Value","Number of Failed Pins","Failed Pins"]
                 if self.outputForm is 3:
                     header = ["Chip Type","Chip Temp","File Index"]+header
                 if self.outputForm is 2:
@@ -298,39 +283,37 @@ class txtToCsv:
             self.vminCkbData[len(self.vminCkbData)-1].extend(tempList)
             return
         if re.search("\Ashmoo_bsmin_vec",line):
-            self.vminCkbData[len(self.vminCkbData)-1][24] = lineArray[1]
+            tempLen = len(self.vminCkbData)-1
+            self.vminCkbData[tempLen][len(self.vminCkbData[tempLen])-2] = lineArray[1][:-1]
             return
         lineArray.insert(1,re.search("[a-zA-Z]+(?=_[a-zA-Z0-9]+\Z)",lineArray[1]).group(0))
         lineArray[2]=re.search("(?<=_)[a-zA-Z0-9]+\Z",lineArray[2]).group(0)
 
         if re.search("(?<=\AVmax_vec_)[a-zA-Z0-9]+?(?=_)",lineArray[3]).group(0) == "cln16ffcll":
-            lineArray.insert(3,re.search("(?<=\AVmax_vec_)[a-zA-Z0-9_]+?(?=_w)",lineArray[3]).group(0))
-            lineArray[4]=re.sub("\AVmax_vec_[a-zA-Z0-9_]+?(?=w)","",lineArray[4])
+            lineArray.insert(3,re.search("(?<=\AVmax_vec_)[a-zA-Z0-9_]+?_[a-zA-Z0-9]+?_[a-zA-Z0-9]+?_[a-zA-Z0-9]+?(?=_)",lineArray[3]).group(0))
+            lineArray[4]=re.sub("\AVmax_vec_[a-zA-Z0-9_]+?_[a-zA-Z0-9]+?_[a-zA-Z0-9]+?_[a-zA-Z0-9]+?_","",lineArray[4])
         else:
-            lineArray.insert(3,re.search("(?<=\AVmax_vec_)[a-zA-Z0-9]+?(?=_)",lineArray[3]).group(0))
-            lineArray[4]=re.sub("\AVmax_vec_[a-zA-Z0-9]+?_","",lineArray[4])
+            lineArray.insert(3,re.search("(?<=\AVmax_vec_)[a-zA-Z0-9]+?_[a-zA-Z0-9]+?(?=_)",lineArray[3]).group(0))
+            lineArray[4]=re.sub("\AVmax_vec_[a-zA-Z0-9]+?_[a-zA-Z0-9]+?_","",lineArray[4])
 
-        lineArray.insert(4,re.match("[a-zA-Z0-9]+?(?=_)",lineArray[4]).group(0))
-        lineArray[5]=re.sub("\A[a-zA-Z0-9]+?_","",lineArray[5])
-
-        lineArray.insert(5,re.search("\A[a-zA-Z0-9_]+?(?=_ema)",lineArray[5]).group(0))
-        lineArray.insert(6,re.search("(?<=ema)[a-zA-Z0-9]+?(?=_ema)",lineArray[6]).group(0))
-        lineArray.insert(7,re.search("(?<=ema)[a-zA-Z0-9]+?(?=_emaw)",lineArray[7]).group(0))
-        lineArray.insert(8,re.search("(?<=_emaw)[a-zA-Z0-9]+?(?=_emas)",lineArray[8]).group(0))
-        lineArray.insert(9,re.search("(?<=_emas)[a-zA-Z0-9]+?(?=_emap)",lineArray[9]).group(0))
-        lineArray.insert(10,re.search("(?<=_emap)[a-zA-Z0-9]+?(?=_wabl)",lineArray[10]).group(0))
-        lineArray.insert(11,re.search("(?<=_wabl)[a-zA-Z0-9]+?(?=_wablm)",lineArray[11]).group(0))
-        lineArray.insert(12,re.search("(?<=_wablm)[a-zA-Z0-9]+?(?=_rawl)",lineArray[12]).group(0))
-        lineArray.insert(13,re.search("(?<=_rawl)[a-zA-Z0-9]+?(?=_rawlm)",lineArray[13]).group(0))
-        lineArray.insert(14,re.search("(?<=_rawlm)[a-zA-Z0-9]+?(?=_ken)",lineArray[14]).group(0))
-        lineArray.insert(15,re.search("(?<=_ken)[a-zA-Z0-9]+?(?=_vddpe)",lineArray[15]).group(0))
-        lineArray.insert(16,re.search("(?<=_vddpe_)[\-\..a-zA-Z0-9]+?(?=V_vddce)",lineArray[16]).group(0)+" V")
-        lineArray.insert(17,re.search("(?<=_vddce_)[\-\.a-zA-Z0-9]+?(?=V_dvdd)",lineArray[17]).group(0)+" V")
-        lineArray.insert(18,re.search("(?<=_dvdd_)[\-\.a-zA-Z0-9]+?(?=V_)",lineArray[18]).group(0)+" V")
-        lineArray[19]=re.search("(?<=_)[\-\.a-zA-Z0-9]+?(?=ns\Z)",lineArray[19]).group(0)+" ns"
+        lineArray.insert(4,re.search("\A[a-zA-Z0-9_]+?(?=_ema)",lineArray[4]).group(0))
+        lineArray.insert(5,re.search("(?<=ema)[a-zA-Z0-9]+?(?=_ema)",lineArray[5]).group(0))
+        lineArray.insert(6,re.search("(?<=ema)[a-zA-Z0-9]+?(?=_emaw)",lineArray[6]).group(0))
+        lineArray.insert(7,re.search("(?<=_emaw)[a-zA-Z0-9]+?(?=_emas)",lineArray[7]).group(0))
+        lineArray.insert(8,re.search("(?<=_emas)[a-zA-Z0-9]+?(?=_emap)",lineArray[8]).group(0))
+        lineArray.insert(9,re.search("(?<=_emap)[a-zA-Z0-9]+?(?=_wabl)",lineArray[9]).group(0))
+        lineArray.insert(10,re.search("(?<=_wabl)[a-zA-Z0-9]+?(?=_wablm)",lineArray[10]).group(0))
+        lineArray.insert(11,re.search("(?<=_wablm)[a-zA-Z0-9]+?(?=_rawl)",lineArray[11]).group(0))
+        lineArray.insert(12,re.search("(?<=_rawl)[a-zA-Z0-9]+?(?=_rawlm)",lineArray[12]).group(0))
+        lineArray.insert(13,re.search("(?<=_rawlm)[a-zA-Z0-9]+?(?=_ken)",lineArray[13]).group(0))
+        lineArray.insert(14,re.search("(?<=_ken)[a-zA-Z0-9]+?(?=_vddpe)",lineArray[14]).group(0))
+        lineArray.insert(15,re.search("(?<=_vddpe_)[\-\..a-zA-Z0-9]+?(?=V_vddce)",lineArray[15]).group(0)+" V")
+        lineArray.insert(16,re.search("(?<=_vddce_)[\-\.a-zA-Z0-9]+?(?=V_dvdd)",lineArray[16]).group(0)+" V")
+        lineArray.insert(17,re.search("(?<=_dvdd_)[\-\.a-zA-Z0-9]+?(?=V_)",lineArray[17]).group(0)+" V")
+        lineArray[18]=re.search("(?<=_)[\-\.a-zA-Z0-9]+?(?=ns\Z)",lineArray[18]).group(0)+" ns"
 
         lineArray.append("")
-        if(lineArray[20]=="(P)"):
+        if(lineArray[19]=="(P)"):
             lineArray.append("0")
 
         if self.outputForm is 3:
@@ -365,30 +348,27 @@ class txtToCsv:
             return
 
         if re.search("\Ashmoo_bsmin_vec",line):
-            self.shmooData[len(self.shmooData)-1].append(lineArray[1])
+            self.shmooData[len(self.shmooData)-1].append(lineArray[1][:-1])
             return
 
         if re.search("(?<=\Ashmoo_vec_)[a-zA-Z0-9]+?(?=_)",lineArray[0]).group(0) == "cln16ffcll":
-            lineArray.insert(0,re.search("(?<=\Ashmoo_vec_)[a-zA-Z0-9_]+?(?=_w)",lineArray[0]).group(0))
-            lineArray[1]=re.sub("\Ashmoo_vec_[a-zA-Z0-9_]+?(?=w)","",lineArray[1])
+            lineArray.insert(0,re.search("(?<=\Ashmoo_vec_)[a-zA-Z0-9_]+?_[a-zA-Z0-9]+?_[a-zA-Z0-9]+?_[a-zA-Z0-9]+?(?=_)",lineArray[0]).group(0))
+            lineArray[1]=re.sub("\Ashmoo_vec_[a-zA-Z0-9_]+?_[a-zA-Z0-9]+?_[a-zA-Z0-9]+?_[a-zA-Z0-9]+?_","",lineArray[1])
         else:
-            lineArray.insert(0,re.search("(?<=\Ashmoo_vec_)[a-zA-Z0-9]+?(?=_)",lineArray[0]).group(0))
-            lineArray[1]=re.sub("\Ashmoo_vec_[a-zA-Z0-9]+?_","",lineArray[1])
+            lineArray.insert(0,re.search("(?<=\Ashmoo_vec_)[a-zA-Z0-9]+?_[a-zA-Z0-9]+?(?=_)",lineArray[0]).group(0))
+            lineArray[1]=re.sub("\Ashmoo_vec_[a-zA-Z0-9]+?_[a-zA-Z0-9]+?_","",lineArray[1])
 
-        lineArray.insert(1,re.match("[a-zA-Z0-9]+?(?=_)",lineArray[1]).group(0))
-        lineArray[2]=re.sub("\A[a-zA-Z0-9]+?_","",lineArray[2])
-
-        lineArray.insert(2,re.search("\A[a-zA-Z0-9_]+?(?=_ema)",lineArray[2]).group(0))
-        lineArray.insert(3,re.search("(?<=ema)[a-zA-Z0-9]+?(?=_ema)",lineArray[3]).group(0))
-        lineArray.insert(4,re.search("(?<=ema)[a-zA-Z0-9]+?(?=_emaw)",lineArray[4]).group(0))
-        lineArray.insert(5,re.search("(?<=_emaw)[a-zA-Z0-9]+?(?=_emas)",lineArray[5]).group(0))
-        lineArray.insert(6,re.search("(?<=_emas)[a-zA-Z0-9]+?(?=_emap)",lineArray[6]).group(0))
-        lineArray.insert(7,re.search("(?<=_emap)[a-zA-Z0-9]+?(?=_wabl)",lineArray[7]).group(0))
-        lineArray.insert(8,re.search("(?<=_wabl)[a-zA-Z0-9]+?(?=_wablm)",lineArray[8]).group(0))
-        lineArray.insert(9,re.search("(?<=_wablm)[a-zA-Z0-9]+?(?=_rawl)",lineArray[9]).group(0))
-        lineArray.insert(10,re.search("(?<=_rawl)[a-zA-Z0-9]+?(?=_rawlm)",lineArray[10]).group(0))
-        lineArray.insert(11,re.search("(?<=_rawlm)[a-zA-Z0-9]+?(?=_ken)",lineArray[11]).group(0))
-        lineArray[12]=re.search("(?<=_ken)[a-zA-Z0-9]+?\Z",lineArray[12]).group(0)
+        lineArray.insert(1,re.search("\A[a-zA-Z0-9_]+?(?=_ema)",lineArray[1]).group(0))
+        lineArray.insert(2,re.search("(?<=ema)[a-zA-Z0-9]+?(?=_ema)",lineArray[2]).group(0))
+        lineArray.insert(3,re.search("(?<=ema)[a-zA-Z0-9]+?(?=_emaw)",lineArray[3]).group(0))
+        lineArray.insert(4,re.search("(?<=_emaw)[a-zA-Z0-9]+?(?=_emas)",lineArray[4]).group(0))
+        lineArray.insert(5,re.search("(?<=_emas)[a-zA-Z0-9]+?(?=_emap)",lineArray[5]).group(0))
+        lineArray.insert(6,re.search("(?<=_emap)[a-zA-Z0-9]+?(?=_wabl)",lineArray[6]).group(0))
+        lineArray.insert(7,re.search("(?<=_wabl)[a-zA-Z0-9]+?(?=_wablm)",lineArray[7]).group(0))
+        lineArray.insert(8,re.search("(?<=_wablm)[a-zA-Z0-9]+?(?=_rawl)",lineArray[8]).group(0))
+        lineArray.insert(9,re.search("(?<=_rawl)[a-zA-Z0-9]+?(?=_rawlm)",lineArray[9]).group(0))
+        lineArray.insert(10,re.search("(?<=_rawlm)[a-zA-Z0-9]+?(?=_ken)",lineArray[10]).group(0))
+        lineArray[11]=re.search("(?<=_ken)[a-zA-Z0-9]+?\Z",lineArray[11]).group(0)
 
         if self.outputForm is 3:
             lineArray=[self.fileType,self.fileTemp,self.fileIndex]+lineArray

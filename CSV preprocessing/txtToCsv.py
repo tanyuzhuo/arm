@@ -187,7 +187,7 @@ class txtToCsv:
 
         lineArray.insert(1,re.search("(?<=stdcell_)[a-z0-9]+?_[a-z0-9]+?_[a-z0-9]+?_[a-z0-9]+?(?=_)",lineArray[1]).group(0))
 
-        lineArray.insert(2,re.search("(?<=vdd_)[\-0-9\.]+(?=V_dvdd)",lineArray[2]).group(0)+" V")
+        lineArray.insert(2,re.search("(?<=vdd_)[\-0-9\.]+(?=V_dvdd)",lineArray[2]).group(0))
         lineArray.insert(3,re.search("(?<=dvdd_)[\-0-9\.]+(?=V_)",lineArray[3]).group(0)+" V")
 
         lineArray[4]=re.search("(?<=_)[-0-9.]+(?=nS\Z)",lineArray[4]).group(0)+" ns"
@@ -244,8 +244,8 @@ class txtToCsv:
         lineArray.insert(12,re.search("(?<=_rawl)[a-zA-Z0-9]+?(?=_rawlm)",lineArray[12]).group(0))
         lineArray.insert(13,re.search("(?<=_rawlm)[a-zA-Z0-9]+?(?=_ken)",lineArray[13]).group(0))
         lineArray.insert(14,re.search("(?<=_ken)[a-zA-Z0-9]+?(?=_vddpe)",lineArray[14]).group(0))
-        lineArray.insert(15,re.search("(?<=_vddpe_)[\-\..a-zA-Z0-9]+?(?=V_vddce)",lineArray[15]).group(0)+" V")
-        lineArray.insert(16,re.search("(?<=_vddce_)[\-\.a-zA-Z0-9]+?(?=V_dvdd)",lineArray[16]).group(0)+" V")
+        lineArray.insert(15,re.search("(?<=_vddpe_)[\-\..a-zA-Z0-9]+?(?=V_vddce)",lineArray[15]).group(0))
+        lineArray.insert(16,re.search("(?<=_vddce_)[\-\.a-zA-Z0-9]+?(?=V_dvdd)",lineArray[16]).group(0))
         lineArray.insert(17,re.search("(?<=_dvdd_)[\-\.a-zA-Z0-9]+?(?=V_)",lineArray[17]).group(0)+" V")
         lineArray[18]=re.search("(?<=_)[\-\.a-zA-Z0-9]+?(?=ns\Z)",lineArray[18]).group(0)+" ns"
 
@@ -307,8 +307,8 @@ class txtToCsv:
         lineArray.insert(12,re.search("(?<=_rawl)[a-zA-Z0-9]+?(?=_rawlm)",lineArray[12]).group(0))
         lineArray.insert(13,re.search("(?<=_rawlm)[a-zA-Z0-9]+?(?=_ken)",lineArray[13]).group(0))
         lineArray.insert(14,re.search("(?<=_ken)[a-zA-Z0-9]+?(?=_vddpe)",lineArray[14]).group(0))
-        lineArray.insert(15,re.search("(?<=_vddpe_)[\-\..a-zA-Z0-9]+?(?=V_vddce)",lineArray[15]).group(0)+" V")
-        lineArray.insert(16,re.search("(?<=_vddce_)[\-\.a-zA-Z0-9]+?(?=V_dvdd)",lineArray[16]).group(0)+" V")
+        lineArray.insert(15,re.search("(?<=_vddpe_)[\-\..a-zA-Z0-9]+?(?=V_vddce)",lineArray[15]).group(0))
+        lineArray.insert(16,re.search("(?<=_vddce_)[\-\.a-zA-Z0-9]+?(?=V_dvdd)",lineArray[16]).group(0))
         lineArray.insert(17,re.search("(?<=_dvdd_)[\-\.a-zA-Z0-9]+?(?=V_)",lineArray[17]).group(0)+" V")
         lineArray[18]=re.search("(?<=_)[\-\.a-zA-Z0-9]+?(?=ns\Z)",lineArray[18]).group(0)+" ns"
 

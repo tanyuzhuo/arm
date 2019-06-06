@@ -87,7 +87,7 @@ class wholeDataTest:
 
                 testTime = datetime.datetime.now()-startTestTime
                 print("I am on number "+str(allFilesCounter)+" of "+str(totalNoFiles), end='\r', flush=True)
-                #print("file "+file.fileName+" in time = "+str(testTime))
+                print("file "+file.fileName+" in time = "+str(testTime))
                 averageTestTime += testTime
             except AttributeError as error:
                 print(str(error)+" lines in file "+file.fileName+" were not created")

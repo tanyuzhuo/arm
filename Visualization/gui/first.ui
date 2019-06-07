@@ -9,274 +9,583 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>833</width>
-    <height>662</height>
+    <width>769</width>
+    <height>771</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Arm Test Chips Data Visualization</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLabel" name="label_Target">
-    <property name="geometry">
-     <rect>
-      <x>31</x>
-      <y>71</y>
-      <width>150</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Calibri</family>
-      <pointsize>13</pointsize>
-      <weight>75</weight>
-      <italic>true</italic>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>Select Target Graphs:</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="comboBox">
-    <property name="geometry">
-     <rect>
-      <x>190</x>
-      <y>70</y>
-      <width>111</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <item>
-     <property name="text">
-      <string>Stdcell Yield Data</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Stdcell Vmin Data</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Stdcell Shmoo Data</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Memory Yield Data</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Memory Vmin Data</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Memmory Shmoo Data</string>
-     </property>
-    </item>
-   </widget>
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>140</y>
-      <width>91</width>
-      <height>21</height>
+      <x>570</x>
+      <y>550</y>
+      <width>121</width>
+      <height>91</height>
      </rect>
     </property>
     <property name="text">
      <string>Generate</string>
     </property>
    </widget>
-   <widget class="MplWidget" name="MplWidget" native="true">
+   <widget class="QGroupBox" name="groupBox_Settings">
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>170</y>
-      <width>611</width>
-      <height>391</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>40</y>
-      <width>511</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QLabel" name="label">
-       <property name="font">
-        <font>
-         <family>Calibri</family>
-         <pointsize>13</pointsize>
-         <weight>75</weight>
-         <italic>true</italic>
-         <bold>true</bold>
-         <strikeout>false</strikeout>
-         <kerning>false</kerning>
-        </font>
-       </property>
-       <property name="text">
-        <string>Select Datalog Files:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="lineEdit"/>
-     </item>
-     <item>
-      <widget class="QToolButton" name="toolButton">
-       <property name="text">
-        <string>...</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QComboBox" name="comboBox_Voltage">
-    <property name="geometry">
-     <rect>
-      <x>170</x>
-      <y>100</y>
-      <width>69</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="comboBox_Lib">
-    <property name="geometry">
-     <rect>
-      <x>250</x>
-      <y>100</y>
-      <width>69</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_Settings">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>100</y>
-      <width>131</width>
-      <height>21</height>
+      <y>30</y>
+      <width>701</width>
+      <height>161</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <family>Calibri</family>
-      <pointsize>13</pointsize>
-      <weight>75</weight>
-      <italic>true</italic>
-      <bold>true</bold>
+      <family>DINPro-Regular</family>
+      <pointsize>12</pointsize>
      </font>
     </property>
-    <property name="text">
-     <string>Advance Settings:</string>
+    <property name="title">
+     <string>Input Options</string>
     </property>
+    <property name="flat">
+     <bool>true</bool>
+    </property>
+    <widget class="QLabel" name="label_Target">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>70</y>
+       <width>150</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Calibri</family>
+       <pointsize>13</pointsize>
+       <weight>75</weight>
+       <italic>true</italic>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Select Target Graphs:</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="comboBox">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>70</y>
+       <width>185</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <item>
+      <property name="text">
+       <string>Stdcell Yield Data</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Stdcell Vmin Data</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Stdcell Shmoo Data</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Memory Yield Data</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Memory Vmin Data</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Memory Shmoo Data</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="QWidget" name="">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>29</y>
+       <width>681</width>
+       <height>33</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="font">
+         <font>
+          <family>Calibri</family>
+          <pointsize>13</pointsize>
+          <weight>75</weight>
+          <italic>true</italic>
+          <bold>true</bold>
+          <strikeout>false</strikeout>
+          <kerning>false</kerning>
+         </font>
+        </property>
+        <property name="text">
+         <string>Select Datalog Files:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdit"/>
+      </item>
+      <item>
+       <widget class="QToolButton" name="toolButton">
+        <property name="text">
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_Process">
+        <property name="text">
+         <string>Process</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QLabel" name="label_Temp">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>110</y>
+       <width>140</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Calibri</family>
+       <pointsize>13</pointsize>
+       <weight>75</weight>
+       <italic>true</italic>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Select Temperature:</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="comboBox_Temp">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>110</y>
+       <width>141</width>
+       <height>26</height>
+      </rect>
+     </property>
+    </widget>
    </widget>
-   <widget class="QLabel" name="label_Temp">
+   <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>320</x>
-      <y>70</y>
-      <width>101</width>
-      <height>21</height>
+      <x>40</x>
+      <y>200</y>
+      <width>661</width>
+      <height>121</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <family>Calibri</family>
-      <pointsize>13</pointsize>
-      <weight>75</weight>
-      <italic>true</italic>
-      <bold>true</bold>
+      <family>DINPro-Regular</family>
+      <pointsize>12</pointsize>
      </font>
     </property>
-    <property name="text">
-     <string>Temperature:</string>
+    <property name="title">
+     <string>Stdcell Advanced Graph Settings</string>
     </property>
+    <property name="flat">
+     <bool>true</bool>
+    </property>
+    <widget class="QGroupBox" name="groupBox_StdYield">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>30</y>
+       <width>181</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string> Std Yield</string>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
+     <widget class="QLabel" name="label_Vol">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>30</y>
+        <width>61</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>13</pointsize>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Voltage:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_Voltage_StdYield">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>30</y>
+        <width>69</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_StdVmin">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>30</y>
+       <width>251</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Std Vmin</string>
+     </property>
+     <widget class="QLabel" name="label_Lib">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>30</y>
+        <width>71</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>13</pointsize>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Library:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_Lib">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>30</y>
+        <width>151</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_StdShmoo">
+     <property name="geometry">
+      <rect>
+       <x>460</x>
+       <y>30</y>
+       <width>181</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Std Shmoo</string>
+     </property>
+     <widget class="QLabel" name="label_Split">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>30</y>
+        <width>61</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>13</pointsize>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Split:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_Split">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>30</y>
+        <width>69</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
    </widget>
-   <widget class="QRadioButton" name="radioButton">
+   <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
-      <x>430</x>
-      <y>80</y>
-      <width>81</width>
-      <height>16</height>
+      <x>40</x>
+      <y>330</y>
+      <width>721</width>
+      <height>161</height>
      </rect>
     </property>
-    <property name="text">
-     <string>M40C</string>
+    <property name="font">
+     <font>
+      <family>DINPro-Regular</family>
+      <pointsize>12</pointsize>
+     </font>
     </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_2">
-    <property name="geometry">
-     <rect>
-      <x>430</x>
-      <y>100</y>
-      <width>82</width>
-      <height>17</height>
-     </rect>
+    <property name="title">
+     <string>Memory Advanced Graph Settings</string>
     </property>
-    <property name="text">
-     <string>25C</string>
+    <property name="flat">
+     <bool>true</bool>
     </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_3">
-    <property name="geometry">
-     <rect>
-      <x>430</x>
-      <y>120</y>
-      <width>82</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>125C</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_4">
-    <property name="geometry">
-     <rect>
-      <x>430</x>
-      <y>140</y>
-      <width>82</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>150C</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="comboBox_Split">
-    <property name="geometry">
-     <rect>
-      <x>170</x>
-      <y>130</y>
-      <width>69</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="comboBox_Ema">
-    <property name="geometry">
-     <rect>
-      <x>250</x>
-      <y>130</y>
-      <width>69</width>
-      <height>22</height>
-     </rect>
-    </property>
+    <widget class="QGroupBox" name="groupBox_MemYield">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>40</y>
+       <width>191</width>
+       <height>111</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Mem Yield</string>
+     </property>
+     <widget class="QLabel" name="label_Vol_2">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>30</y>
+        <width>61</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>13</pointsize>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Voltage:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_Voltage_MemYield">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>30</y>
+        <width>69</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_Temp_5">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>70</y>
+        <width>71</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>13</pointsize>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Ema:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_EmaYield">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>70</y>
+        <width>69</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_MemVmin">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>40</y>
+       <width>281</width>
+       <height>111</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Mem Vmin</string>
+     </property>
+     <widget class="QLabel" name="label_Lib_2">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>30</y>
+        <width>71</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>13</pointsize>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Instance:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_Instance">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>30</y>
+        <width>161</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>60</y>
+        <width>47</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>OR</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_Temp_4">
+      <property name="geometry">
+       <rect>
+        <x>60</x>
+        <y>80</y>
+        <width>41</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>13</pointsize>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Ema:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_EmaVmin">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>80</y>
+        <width>69</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_MemShmoo">
+     <property name="geometry">
+      <rect>
+       <x>490</x>
+       <y>40</y>
+       <width>171</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Mem Shmoo</string>
+     </property>
+     <widget class="QLabel" name="label_Split_2">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>30</y>
+        <width>61</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>13</pointsize>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Split:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_Split_2">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>30</y>
+        <width>69</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -284,7 +593,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>833</width>
+     <width>769</width>
      <height>23</height>
     </rect>
    </property>
@@ -313,14 +622,6 @@
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>MplWidget</class>
-   <extends>QWidget</extends>
-   <header>mplwidget.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

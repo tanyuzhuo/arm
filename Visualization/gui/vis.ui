@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>769</width>
+    <width>792</width>
     <height>771</height>
    </rect>
   </property>
@@ -20,11 +20,16 @@
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>570</x>
-      <y>550</y>
-      <width>121</width>
-      <height>91</height>
+      <x>600</x>
+      <y>560</y>
+      <width>141</width>
+      <height>111</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>15</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>Generate</string>
@@ -391,9 +396,9 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>330</y>
+      <y>320</y>
       <width>721</width>
-      <height>191</height>
+      <height>241</height>
      </rect>
     </property>
     <property name="font">
@@ -485,56 +490,11 @@
       </property>
      </widget>
     </widget>
-    <widget class="QGroupBox" name="groupBox_MemVmin">
-     <property name="geometry">
-      <rect>
-       <x>200</x>
-       <y>40</y>
-       <width>281</width>
-       <height>61</height>
-      </rect>
-     </property>
-     <property name="title">
-      <string>Mem Vmin(Ema Plots)</string>
-     </property>
-     <widget class="QLabel" name="label_Lib_2">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>30</y>
-        <width>71</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Calibri</family>
-        <pointsize>13</pointsize>
-        <weight>75</weight>
-        <italic>true</italic>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Instance:</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="comboBox_Instance">
-      <property name="geometry">
-       <rect>
-        <x>110</x>
-        <y>30</y>
-        <width>161</width>
-        <height>22</height>
-       </rect>
-      </property>
-     </widget>
-    </widget>
     <widget class="QGroupBox" name="groupBox_MemShmoo">
      <property name="geometry">
       <rect>
-       <x>490</x>
-       <y>40</y>
+       <x>570</x>
+       <y>30</y>
        <width>171</width>
        <height>71</height>
       </rect>
@@ -575,40 +535,30 @@
       </property>
      </widget>
     </widget>
-    <widget class="QGroupBox" name="groupBox_MemVmin_2">
+    <widget class="QGroupBox" name="groupBox_3">
      <property name="geometry">
       <rect>
        <x>200</x>
-       <y>110</y>
-       <width>281</width>
-       <height>61</height>
+       <y>20</y>
+       <width>351</width>
+       <height>221</height>
       </rect>
      </property>
      <property name="font">
       <font>
        <family>DINPro-Regular</family>
-       <pointsize>11</pointsize>
+       <pointsize>12</pointsize>
       </font>
      </property>
      <property name="title">
-      <string>Mem Vmin(Instance Plots)</string>
+      <string>Mem Vmin</string>
      </property>
-     <widget class="QComboBox" name="comboBox_EmaVmin">
-      <property name="geometry">
-       <rect>
-        <x>110</x>
-        <y>30</y>
-        <width>69</width>
-        <height>22</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_Temp_4">
+     <widget class="QLabel" name="label_Lib_3">
       <property name="geometry">
        <rect>
         <x>60</x>
         <y>30</y>
-        <width>41</width>
+        <width>71</width>
         <height>21</height>
        </rect>
       </property>
@@ -622,17 +572,129 @@
        </font>
       </property>
       <property name="text">
-       <string>Ema:</string>
+       <string>Split:</string>
       </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_SplitVmin">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>30</y>
+        <width>69</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_MemVmin_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>140</y>
+        <width>281</width>
+        <height>61</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>DINPro-Regular</family>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+      <property name="title">
+       <string>Mem Vmin(Instance Plots)</string>
+      </property>
+      <widget class="QComboBox" name="comboBox_EmaVmin">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>30</y>
+         <width>69</width>
+         <height>22</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_Temp_4">
+       <property name="geometry">
+        <rect>
+         <x>60</x>
+         <y>30</y>
+         <width>41</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Calibri</family>
+         <pointsize>13</pointsize>
+         <weight>75</weight>
+         <italic>true</italic>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Ema:</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_MemVmin">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>70</y>
+        <width>331</width>
+        <height>71</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>DINPro-Regular</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="title">
+       <string>Mem Vmin(Ema Plots)</string>
+      </property>
+      <widget class="QComboBox" name="comboBox_Instance">
+       <property name="geometry">
+        <rect>
+         <x>100</x>
+         <y>30</y>
+         <width>221</width>
+         <height>22</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_Temp_6">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>20</y>
+         <width>71</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Calibri</family>
+         <pointsize>13</pointsize>
+         <weight>75</weight>
+         <italic>true</italic>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Instance:</string>
+       </property>
+      </widget>
      </widget>
     </widget>
    </widget>
    <widget class="QLabel" name="label_4">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>530</y>
-      <width>241</width>
+      <x>20</x>
+      <y>560</y>
+      <width>201</width>
       <height>151</height>
      </rect>
     </property>
@@ -649,7 +711,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>769</width>
+     <width>792</width>
      <height>23</height>
     </rect>
    </property>

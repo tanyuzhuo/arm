@@ -278,3 +278,156 @@ def mem_vmin_data_ss_two():
 
        plt.show()
        return
+
+"""
+inputs:temperature,ss dataset,v1,v2
+rows:library names
+columns:voltage range,step is 20mV(default)
+cell_text: p/f
+"""
+def sc_shamoo_data_ss(v1,v2):
+       #obtain required dataframe based on inputs
+       df = pd.read_csv('vminStd.csv')
+       temp_list = ['25', '125', '150', 'M40']
+       df_ss = df.loc[df['Chip Type'] == 'SS']
+       temp = temp_list[0]
+       dftemp = df_ss.loc[df_ss['Chip Temp'] == temp]
+
+       #obtain rows
+       dflibf = df_ss.drop_duplicates(['Test Item'])
+       dflib = dflibf['Test Item']
+       library_names_list = dflib.values.tolist()
+       rows = library_names_list
+
+       #obtain columns
+       vol_list = []
+       tmpv = v1
+       while (tmpv <= v2):
+              vol_list.append(tmpv)
+              tmpv += 0.02
+              tmpv = round(tmpv, 2)
+       columns = vol_list
+
+
+       #obtain max. shamoo value as standard
+       #if vol < shamoo: 'f' else: 'p'
+       cell_text = []
+       cell_color = []
+       for i in range(len(library_names_list)):
+              library_name = library_names_list[i]
+              df_required = dftemp.loc[dftemp['Test Item'] == library_name]
+              df_shamoo = df_required.loc[df_required['Shmoo Value'].isnull() == False]
+              shamoo_value = max(df_shamoo['Shmoo Value'].values.tolist())
+
+              # obtain cell_text
+              tmp_cell_text = []
+              tmp_cell_color = []
+              # cell_text = []
+              for vol in vol_list:
+                     if (vol <= shamoo_value):
+                            tmp_cell_text.append('F')
+                            tmp_cell_color.append("#ff0000")
+                     else:
+                            tmp_cell_text.append('P')
+                            tmp_cell_color.append("#008000")
+
+              cell_text.append(tmp_cell_text)
+              cell_color.append(tmp_cell_color)
+              tmp_cell_text = []
+              tmp_cell_color = []
+
+       #plotting table
+       fig = plt.figure()
+       ax = fig.add_subplot(111)
+       ax.axis('off')
+       #title might overlap with the table(can be adjusted by pad,but depends on how large the table is.)
+      # plt.title('Shamoo data for SS at Temp = ' + str(temp) + chr(176) + 'C',pad = 40)
+
+       the_table = plt.table(cellText=cell_text,
+                             cellColours=cell_color,
+                             rowLabels=rows,
+                             colLabels=columns,
+                             loc='center')
+       plt.show()
+
+def memory_shamoo_data_ss(v1,v2):
+       #obtain required dataframe
+       df = pd.read_csv('vminCkb.csv')
+       temp_list = ['25', '125', '150', 'M40']
+       df_ss = df.loc[df['Chip Type'] == 'SS']
+       temp = temp_list[0]
+       dftemp = df_ss.loc[df_ss['Chip Temp'] == temp]
+
+       #obtain columns
+       vol_list = []
+       tmpv = v1
+       while (tmpv <= v2):
+              vol_list.append(tmpv)
+              tmpv += 0.02
+              tmpv = round(tmpv, 2)
+       columns = vol_list
+
+       # obtain rows
+       dfmemf = df_ss.drop_duplicates(['Architecture'])
+       mem_instances_list = dfmemf['Architecture'].values.tolist()
+       rows = mem_instances_list
+
+       # obtain max. shamoo value as standard
+       # if vol < shamoo: 'f' else: 'p'
+       cell_text = []
+       cell_color = []
+       for i in range(len(mem_instances_list)):
+              mem_name = mem_instances_list[i]
+              df_required = dftemp.loc[dftemp['Architecture'] == mem_name]
+              shamoo_value = max(df_required['Shmoo Value'].values.tolist())
+
+              # obtain cell_text
+              tmp_cell_text = []
+              tmp_cell_color = []
+              # cell_text = []
+              for vol in vol_list:
+                     if (vol <= shamoo_value):
+                            tmp_cell_text.append('F')
+                            tmp_cell_color.append("#ff0000")
+                     else:
+                            tmp_cell_text.append('P')
+                            tmp_cell_color.append("#008000")
+
+              cell_text.append(tmp_cell_text)
+              cell_color.append(tmp_cell_color)
+              tmp_cell_text = []
+              tmp_cell_color = []
+
+       # plt.title('Shamoo data for SS at Temp = ' + str(temp) + chr(176) + 'C',pad = 40)
+       start_index = 0
+       end_index = 30
+       while(end_index < len(mem_instances_list)):
+              # plotting table
+              fig = plt.figure()
+              ax = fig.add_subplot(111)
+              ax.axis('off')
+              the_table = plt.table(cellText=cell_text[start_index:end_index],
+                                    cellColours=cell_color[start_index:end_index],
+                                    rowLabels=rows[start_index:end_index],
+                                    colLabels=columns,
+                                    loc='center')
+              start_index = end_index
+              end_index += 30
+       # plotting table
+       fig = plt.figure()
+       ax = fig.add_subplot(111)
+       ax.axis('off')
+
+       end_index = len(mem_instances_list)
+       the_table = plt.table(cellText=cell_text[start_index:end_index],
+                             cellColours=cell_color[start_index:end_index],
+                             rowLabels=rows[start_index:end_index],
+                             colLabels=columns,
+                             loc='center')
+       start_index = end_index
+       end_index += 30
+
+       plt.show()
+
+# sc_shamoo_data_ss(0.3,0.5)
+# memory_shamoo_data_ss(0.5,0.7)

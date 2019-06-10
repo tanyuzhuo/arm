@@ -424,9 +424,6 @@ def memory_shamoo_data_ss(v1,v2):
                              rowLabels=rows[start_index:end_index],
                              colLabels=columns,
                              loc='center')
-       start_index = end_index
-       end_index += 30
-
        plt.show()
 
 # sc_shamoo_data_ss(0.3,0.5)

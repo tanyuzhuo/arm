@@ -22,7 +22,8 @@ dfmemckb = pd.DataFrame()
 class mainWindow(QMainWindow):
 
     def __init__(self):
-
+        #inits blank textbox content
+        self.textDirec = ""
         QMainWindow.__init__(self)
 
         loadUi("vis.ui",self)
@@ -114,21 +115,25 @@ class mainWindow(QMainWindow):
             self.groupBox_MemShmoo.hide()
         return
     def preprocessing(self):
+        try:
+            #init class
+            wholeDataTestClass = wholeDataTest.wholeDataTest(self.textDirec)
+            #collect all csv files
+            wholeDataTestClass.collectFiles()
+            #init processing info
+            numberOfFiles = wholeDataTestClass.processAllCSVInit()
+            #loop and process each file
+            for i in range(numberOfFiles):
+                #update status bar here
+                statusPercent = i/numberOfFiles
 
-        #init class
-        wholeDataTestClass = wholeDataTest.wholeDataTest()
-        #collect all csv files
-        wholeDataTestClass.collectFiles()
-        #init processing info
-        numberOfFiles = wholeDataTestClass.processAllCSVInit()
-        #loop and process each file
-        for i in range(numberOfFiles):
-            #update status bar here
-            statusPercent = i/numberOfFiles
+                wholeDataTestClass.processIndivCSV(i)
+            #print test meta info
+            wholeDataTestClass.testsFinished()
 
-            wholeDataTestClass.processIndivCSV()
-        #print test meta info
-        wholeDataTestClass.testsFinished()
+        #catches when file is not chosen correctly
+        except FileNotFoundError as e:
+            print("wrong file selected")
         return
 
     def load(self,text):
@@ -304,7 +309,11 @@ class mainWindow(QMainWindow):
         nominal.associations(df, nominal_columns=['Process','Library'], theil_u= True)
         return
     def files(self):
-        fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Select Datalogs", "", "Datalog Files (*.txt *.csv)") # Ask for file
+        current = QtCore.QDir.current()
+        currentPath = QtCore.QDir.currentPath()
+
+        dir = QtWidgets.QFileDialog.getExistingDirectory(self, "Select Folder", currentPath)
+        self.textDirec = current.relativeFilePath(dir)
 
     def calc_prob(self,df,voltage_list_v):
 

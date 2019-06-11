@@ -8,6 +8,14 @@ import matplotlib.pyplot as plt
 import image
 import wholeDataTest
 
+import random
+from dython import nominal
+import time
+import seaborn as sns
+from matplotlib.ticker import MultipleLocator
+from matplotlib.ticker import MaxNLocator
+from scipy import stats
+
 dfstd = pd.DataFrame()
 dfmem = pd.DataFrame()
 dfmemckb = pd.DataFrame()
@@ -25,6 +33,8 @@ class mainWindow(QMainWindow):
         self.pushButton_Process.clicked.connect(self.preprocessing)
 
         self.pushButton_2.clicked.connect(self.load)
+
+        self.pushButton.clicked.connect(self.ml3)
 
     def print(self,str):
         cur_txt = str
@@ -199,7 +209,90 @@ class mainWindow(QMainWindow):
             self.comboBox_EmaVmin.addItems(ema_list_vmin_string)
 
 
+    def ml(self):
+        global dfstd
+        data=dfstd
+        data['Chip Temp'] = pd.to_numeric(data['Chip Temp'], errors = 'coerce').fillna(-40.0).astype(float)
 
+        # used to create sub-dataframes
+        temperatureList = []
+        vminList = []
+        processList = []
+        libraryList = []
+        for i in range(len(data)): # iterate through csv to pick required data
+
+            if data['Shmoo Value'][i] != -9.9:
+                temperatureList.append(data['Chip Temp'][i])
+                vminList.append(data['Shmoo Value'][i])
+                processList.append(data['Chip Type'][i])
+                libraryList.append(data['Test Item'][i])
+
+        # First Datatict does not include the library data
+        dataDict = {'Library':libraryList, 'Vmin':vminList , 'Temperature':temperatureList, 'Process':processList}
+        df = pd.DataFrame(dataDict)
+
+        #print(df.head()) # (for debugging purposes)
+
+        # boxplot -> process comparison
+        flatui = ["#9b59b6", "#34495e", "#95a5a6", "#e74c3c"]
+        plt.figure(figsize=(13,10))
+        sns.boxplot(x='Process', y='Vmin', data=df, hue='Temperature', showmeans=True, palette = flatui)
+        plt.title('Boxplots of observed SC Vmin by Process and Temperature', fontsize=22)
+        plt.show()
+
+
+        return
+    def ml2(self):
+        global dfstd
+        data=dfstd
+        data['Chip Temp'] = pd.to_numeric(data['Chip Temp'], errors = 'coerce').fillna(-40.0).astype(float)
+
+        # used to create sub-dataframes
+        temperatureList = []
+        vminList = []
+        processList = []
+        libraryList = []
+        for i in range(len(data)): # iterate through csv to pick required data
+
+            if data['Shmoo Value'][i] != -9.9:
+                temperatureList.append(data['Chip Temp'][i])
+                vminList.append(data['Shmoo Value'][i])
+                processList.append(data['Chip Type'][i])
+                libraryList.append(data['Test Item'][i])
+
+        # First Datatict does not include the library data
+        dataDict = {'Library':libraryList, 'Vmin':vminList , 'Temperature':temperatureList, 'Process':processList}
+        df = pd.DataFrame(dataDict)
+
+        # boxplot -> library comparison
+        g = sns.catplot(x='Library', y='Vmin', data=df, col="Process", height = 10, aspect = 2, hue = 'Temperature', kind='box')
+        g.set_xticklabels(rotation=85)
+        plt.show()
+
+        return
+    def ml3(self):
+        global dfstd
+        data=dfstd
+        data['Chip Temp'] = pd.to_numeric(data['Chip Temp'], errors = 'coerce').fillna(-40.0).astype(float)
+
+        # used to create sub-dataframes
+        temperatureList = []
+        vminList = []
+        processList = []
+        libraryList = []
+        for i in range(len(data)): # iterate through csv to pick required data
+
+            if data['Shmoo Value'][i] != -9.9:
+                temperatureList.append(data['Chip Temp'][i])
+                vminList.append(data['Shmoo Value'][i])
+                processList.append(data['Chip Type'][i])
+                libraryList.append(data['Test Item'][i])
+
+        # First Datatict does not include the library data
+        dataDict = {'Library':libraryList, 'Vmin':vminList , 'Temperature':temperatureList, 'Process':processList}
+        df = pd.DataFrame(dataDict)
+        nominal.associations(df, nominal_columns=['Process','Library'], theil_u= True)
+        return
     def files(self):
         fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Select Datalogs", "", "Datalog Files (*.txt *.csv)") # Ask for file
 
@@ -494,8 +587,7 @@ class mainWindow(QMainWindow):
 
                cell_text.append(tmp_cell_text)
                cell_color.append(tmp_cell_color)
-               tmp_cell_text = []
-               tmp_cell_color = []
+
 
         #plotting table
         fig = plt.figure()
@@ -562,8 +654,7 @@ class mainWindow(QMainWindow):
 
                cell_text.append(tmp_cell_text)
                cell_color.append(tmp_cell_color)
-               tmp_cell_text = []
-               tmp_cell_color = []
+
 
         # plt.title('Shamoo data for SS at Temp = ' + str(temp) + chr(176) + 'C',pad = 40)
         start_index = 0

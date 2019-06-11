@@ -43,12 +43,19 @@ inputs: temperature,library name,chip type
 x-axis:vdd
 y-axis:probability of pass
 """
-def calc_prob(df,voltage_list):
-
+def calc_prob(df):
        df_shamoo = df.loc[df['Shmoo Value'].isnull() == False]
        shamoo_value = df_shamoo['Shmoo Value']
-       # transform into list
        shamoo_value_list = shamoo_value.values.tolist()
+       #obtain x-axis
+       voltage_list = []
+       v1 = min(shamoo_value_list) - 0.1
+       v2 = max(shamoo_value_list) + 0.1
+       tmpv = v1
+       while (tmpv <= v2):
+              voltage_list.append(tmpv)
+              tmpv += 0.02
+              tmpv = round(tmpv, 2)
 
        # percentage = No. of (shamoo value < each vdd value) / total number of shamoo value
        prob_list = []
@@ -59,18 +66,10 @@ def calc_prob(df,voltage_list):
                             count += 1
               prob_list.append(100 * count / len(shamoo_value_list))
               count = 0
-       return prob_list
+       return prob_list,voltage_list
 
-def visualize(df,color):
-       dflibf = df.drop_duplicates(['VDD (Range)'])
-       dflib = dflibf['VDD (Range)']
-       # transform into list
-       voltage_list = dflib.values.tolist()
-       prob_list = calc_prob(df,voltage_list)
-       plt.plot(voltage_list, prob_list,color)
-       return
 
-def sc_vmin_data():
+def sc_vmin_data(spec_vol):
        df = pd.read_csv('vminStd.csv')
        temp_list = ['25', '125', '150', 'M40']
 
@@ -89,20 +88,26 @@ def sc_vmin_data():
        ax = fig.add_subplot(111)
        ax.set(xlabel='VDD(V)', ylabel='probability of pass(%)',
               title=library_name + ' at ' + str(temp) + ' ' + chr(176) + 'C')
-       plt.axis([0.4, 1.2, 0, 105])
-
+       # plt.axis([0, 1.0, 0, 105])
 
        df_ff = dftemp_lib.loc[dftemp['Chip Type'] == 'FF']
-       visualize(df_ff,'ys-')
-       df_tt = dftemp_lib.loc[dftemp['Chip Type'] == 'TT']
-       visualize(df_tt, 'bs-')
-       df_ss = dftemp_lib.loc[dftemp['Chip Type'] == 'SS']
-       visualize(df_ss,'rs-')
+       prob_list,vol_list = calc_prob(df_ff)
+       plt.plot(vol_list, prob_list, 'ys-')
 
-       plt.legend(['FF','TT', 'SS'], loc='right')
+       df_ff = dftemp_lib.loc[dftemp['Chip Type'] == 'TT']
+       prob_list,vol_list = calc_prob(df_ff)
+       plt.plot(vol_list, prob_list, 'bs-')
+
+       df_ff = dftemp_lib.loc[dftemp['Chip Type'] == 'SS']
+       prob_list,vol_list = calc_prob(df_ff)
+       plt.plot(vol_list, prob_list, 'rs-')
+
+       plt.axvline(x=spec_vol,linestyle='dashed')
+       plt.legend(['FF','TT', 'SS','operating Spec'], loc='right')
 
        plt.show()
        return
+
 
 """
 inputs:voltage, temperature,ema
@@ -121,12 +126,14 @@ def memory_yield_summary():
        df_ema_temp = dftemp.loc[df['EMA#1'] == ema]
        df_ema_temp_samev = df_ema_temp.loc[df_ema_temp['VDDPE (Range)'] == df_ema_temp['VDDCE (Range)']]
 
+
        dfvol = df_ema_temp_samev.drop_duplicates(['VDDPE (Range)'])
        dfvoll = dfvol['VDDPE (Range)']
        vol_list = dfvoll.values.tolist()
        voltage = vol_list[0]
 
-       df_required = df_ema_temp.loc[df['VDDPE (Range)'] == voltage]
+
+       df_required = df_ema_temp_samev.loc[df['VDDPE (Range)'] == voltage]
        df_pivot = df_required.pivot_table(index=['Architecture'], columns="Chip Type", values="Value",
                                           aggfunc=lambda x: 100 * (x == '(P)').sum() / (
                                                   (x == '(P)').sum() + (x == '(F)').sum()))
@@ -165,6 +172,7 @@ def memory_yield_summary():
        fig.autofmt_xdate()
 
        plt.show()
+       return
 
 """
 inputs: memory instance,temperature
@@ -172,7 +180,7 @@ x-axis:vdd
 y-axis:probability of pass
 plots for different emas
 """
-def mem_vmin_data_ss_one():
+def mem_vmin_data_ss_one(spec_vol):
        #finding required data frame based on inputs
        df = pd.read_csv('vminCkb.csv')
        df_ss = df.loc[df['Chip Type'] == 'SS']
@@ -184,13 +192,6 @@ def mem_vmin_data_ss_one():
        mem_instance = mem_list[0]
        dftemp_mem = dftemp.loc[dftemp['Architecture'] == mem_instance]
 
-       #finding vdd list for x-axis and calc prob of pass
-       tmp_df = pd.read_csv('mem.csv')
-       tmp_df_ss = tmp_df.loc[tmp_df['Chip Type'] == 'SS']
-       tmp_df_ss_samev = tmp_df_ss.loc[tmp_df_ss['VDDPE (Range)'] == tmp_df_ss['VDDCE (Range)']]
-       dfvol = tmp_df_ss_samev.drop_duplicates(['VDDPE (Range)'])
-       vol_list = sorted(dfvol['VDDPE (Range)'].values.tolist())
-
        # finding emas
        dfemas = dftemp_mem.drop_duplicates(['EMA#1'])
        dfema = dfemas['EMA#1']
@@ -201,14 +202,18 @@ def mem_vmin_data_ss_one():
        ax = fig.add_subplot(111)
        ax.set(xlabel='Vdd(V)', ylabel='probability of pass(%)',
               title='Probability plot for <' + mem_instance + '> at Temp = ' + str(temp) + chr(176) + 'C')
-       plt.axis([0.4, 1.2, 0, 105])
+
 
        for ema in ema_list:
               df_required = dftemp_mem.loc[dftemp_mem['EMA#1'] == ema]
-              prob_list = calc_prob(df_required,vol_list)
+              prob_list,vol_list = calc_prob(df_required)
               plt.plot(vol_list, prob_list, 's-')
 
-       plt.legend(ema_list, loc='right')
+       plt.axvline(x=spec_vol, linestyle='dashed')
+       legend_list = ema_list
+       legend_list.append('Operating Spec')
+       plt.legend(legend_list, loc='right')
+
        plt.show()
 
        return
@@ -220,7 +225,7 @@ y-axis:probability of pass
 plots for different memory instance
 '''
 #too many mem instaces -> hard to visualize all
-def mem_vmin_data_ss_two():
+def mem_vmin_data_ss_two(spec_vol):
        #finding required data frame based on inputs
        df = pd.read_csv('vminCkb.csv')
        df_ss = df.loc[df['Chip Type'] == 'SS']
@@ -229,16 +234,6 @@ def mem_vmin_data_ss_two():
        dftemp = df_ss.loc[df['Chip Temp'] == temp]
        default_ema = 'A2'
        dftemp_ema = dftemp.loc[dftemp['EMA#1'] == default_ema]
-
-       #finding vdd list for x-axis and calc prob of pass
-       tmp_df = pd.read_csv('mem.csv')
-       tmp_df_ss = tmp_df.loc[tmp_df['Chip Type'] == 'SS']
-       tmp_df_ss_samev = tmp_df_ss.loc[tmp_df_ss['VDDPE (Range)'] == tmp_df_ss['VDDCE (Range)']]
-       dfvol = tmp_df_ss_samev.drop_duplicates(['VDDPE (Range)'])
-       vol_list = sorted(dfvol['VDDPE (Range)'].values.tolist())
-
-       # vol_list = [0.54, 0.6, 0.63, 0.6375, 0.675, 0.72, 0.81, 0.88, 0.9, 0.96, 1.05, 1.2]
-
 
        # finding memory instance
        dfmems = dftemp_ema.drop_duplicates(['Architecture'])
@@ -252,14 +247,17 @@ def mem_vmin_data_ss_two():
               ax = fig.add_subplot(111)
               ax.set(xlabel='Vdd(V)', ylabel='probability of pass(%)',
                      title='Probability plot for all mem_instances at ema = A2, Temp = ' + str(temp) + chr(176) + 'C')
-              plt.axis([0.4, 1.2, 0, 105])
+
 
               for mem in mem_list[head_index:tail_index]:
                      df_required = dftemp_ema.loc[dftemp_ema['Architecture'] == mem]
-                     prob_list = calc_prob(df_required, vol_list)
+                     prob_list,vol_list = calc_prob(df_required)
                      plt.plot(vol_list, prob_list, 's-')
 
-              plt.legend(mem_list[head_index:tail_index], loc='right')
+              plt.axvline(x=spec_vol, linestyle='dashed')
+              tmp_legend_list = mem_list[head_index:tail_index]
+              tmp_legend_list.append('Operating Spec')
+              plt.legend(tmp_legend_list, loc='right')
               head_index = tail_index
               tail_index += 25
 
@@ -267,14 +265,17 @@ def mem_vmin_data_ss_two():
        ax = fig.add_subplot(111)
        ax.set(xlabel='Vdd(V)', ylabel='probability of pass(%)',
               title='Probability plot for all mem_instances at ema = A2, Temp = ' + str(temp) + chr(176) + 'C')
-       plt.axis([0.4, 1.2, 0, 105])
+
 
        for mem in mem_list[head_index:len(mem_list)]:
               df_required = dftemp_ema.loc[dftemp_ema['Architecture'] == mem]
-              prob_list = calc_prob(df_required, vol_list)
+              prob_list,vol_list = calc_prob(df_required)
               plt.plot(vol_list, prob_list, 's-')
 
-       plt.legend(mem_list[head_index:len(mem_list)], loc='right')
+       plt.axvline(x=spec_vol, linestyle='dashed')
+       tmp_legend_list = mem_list[head_index:len(mem_list)]
+       tmp_legend_list.append('Operating Spec')
+       plt.legend(tmp_legend_list, loc='right')
 
        plt.show()
        return
@@ -333,8 +334,7 @@ def sc_shamoo_data_ss(v1,v2):
 
               cell_text.append(tmp_cell_text)
               cell_color.append(tmp_cell_color)
-              tmp_cell_text = []
-              tmp_cell_color = []
+
 
        #plotting table
        fig = plt.figure()
@@ -395,8 +395,7 @@ def memory_shamoo_data_ss(v1,v2):
 
               cell_text.append(tmp_cell_text)
               cell_color.append(tmp_cell_color)
-              tmp_cell_text = []
-              tmp_cell_color = []
+
 
        # plt.title('Shamoo data for SS at Temp = ' + str(temp) + chr(176) + 'C',pad = 40)
        start_index = 0
@@ -424,7 +423,14 @@ def memory_shamoo_data_ss(v1,v2):
                              rowLabels=rows[start_index:end_index],
                              colLabels=columns,
                              loc='center')
+       start_index = end_index
+       end_index += 30
+
        plt.show()
 
-# sc_shamoo_data_ss(0.3,0.5)
+
+# sc_vmin_data(0.35)
+# mem_vmin_data_ss_one(0.6)
+# mem_vmin_data_ss_two(0.6)
+#sc_shamoo_data_ss(0.3,0.5)
 # memory_shamoo_data_ss(0.5,0.7)

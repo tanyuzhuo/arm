@@ -105,10 +105,20 @@ class mainWindow(QMainWindow):
         return
     def preprocessing(self):
 
+        #init class
         wholeDataTestClass = wholeDataTest.wholeDataTest()
+        #collect all csv files
         wholeDataTestClass.collectFiles()
-        wholeDataTestClass.processAllCSV()
+        #init processing info
+        numberOfFiles = wholeDataTestClass.processAllCSVInit()
+        #loop and process each file
+        for i in range(numberOfFiles):
+            #update status bar here
+            statusPercent = i/numberOfFiles
 
+            wholeDataTestClass.processIndivCSV()
+        #print test meta info
+        wholeDataTestClass.testsFinished()
         return
 
     def load(self,text):

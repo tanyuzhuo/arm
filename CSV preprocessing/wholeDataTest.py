@@ -97,6 +97,6 @@ class wholeDataTest:
         endTime=datetime.datetime.now()
         print("All conversions complete with avgTst = "+str(averageTestTime))
 
-wholeDataTest = wholeDataTest()
-wholeDataTest.collectFiles()
-wholeDataTest.processAllCSV()
+# wholeDataTest = wholeDataTest()
+# wholeDataTest.collectFiles()
+# wholeDataTest.processAllCSV()

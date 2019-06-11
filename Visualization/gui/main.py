@@ -126,7 +126,7 @@ class mainWindow(QMainWindow):
             #update status bar here
             statusPercent = i/numberOfFiles
 
-            wholeDataTestClass.processIndivCSV()
+            wholeDataTestClass.processIndivCSV(i)
         #print test meta info
         wholeDataTestClass.testsFinished()
         return

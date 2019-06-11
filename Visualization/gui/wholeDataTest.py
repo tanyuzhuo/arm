@@ -20,10 +20,10 @@ class fileToParse:
         self.degrees = _degrees
 
 class wholeDataTest:
-    def __init__(self):
+    def __init__(self,textDirec):
         self.allFiles=[]
         self.fileTypes = ["TT","FF","FS","SF","SS"]
-        self.direcOfFiles = "extract_SC_Mem_yield_Vmin"
+        self.direcOfFiles = textDirec
 
     def collectFiles(self):
         try:
@@ -146,6 +146,7 @@ class wholeDataTest:
             print(str(error)+" lines in file "+file.fileName+" were not created")
 
     def testsFinished(self):
+        print()
         print("Total test time = "+str(self.averageTestTime))
         self.averageTestTime /= self.totalNoFiles
         endTime=datetime.datetime.now()

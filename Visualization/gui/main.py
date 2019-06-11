@@ -114,7 +114,7 @@ class mainWindow(QMainWindow):
     def load(self,text):
             global dfstd,dfmem,dfmemckb,temp_list,voltage_list,library_names_list,ema_list_yield,volmem_list,split_list,split_list_vmin,mem_list,ema_list_vmin
             if dfstd.empty:
-              dfstd = pd.read_csv('vminStd.csv')
+              dfstd = pd.read_csv('resultsPerDir/vminStd.csv')
 
             dftempf = dfstd.drop_duplicates(['Chip Temp'])
             dftemplib = dftempf['Chip Temp']
@@ -149,7 +149,7 @@ class mainWindow(QMainWindow):
 
 
             if dfmem.empty:
-              dfmem = pd.read_csv('mem.csv',dtype={"Chip Temp": str})
+              dfmem = pd.read_csv('resultsPerDir/mem.csv',dtype={"Chip Temp": str})
             dfemaf = dfmem.drop_duplicates(['EMA#1'])
             dfema = dfemaf['EMA#1']
             # transform into list
@@ -172,7 +172,7 @@ class mainWindow(QMainWindow):
             #
             #
             if dfmemckb.empty:
-              dfmemckb = pd.read_csv('vminCkb.csv')
+              dfmemckb = pd.read_csv('resultsPerDir/vminCkb.csv')
 
             dfsplit = dfmemckb.drop_duplicates(['Chip Type'])
             dfsplitlib = dfsplit['Chip Type']

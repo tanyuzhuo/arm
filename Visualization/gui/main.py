@@ -21,6 +21,10 @@ dfstd = pd.DataFrame()
 dfmem = pd.DataFrame()
 dfmemckb = pd.DataFrame()
 
+self.textDirec = ""
+
+mutex.lock = threading.lock()
+
 class ProgressCheck(QThread):
      change_value = pyqtSignal(int)
      # running = False
@@ -30,7 +34,9 @@ class ProgressCheck(QThread):
      def run(self):
          try:
              #init class
+             mutex.acquire()
              wholeDataTestClass = wholeDataTest.wholeDataTest(self.textDirec)
+             mutex.release()
              #collect all csv files
              wholeDataTestClass.collectFiles()
              #init processing info
@@ -58,7 +64,7 @@ class mainWindow(QMainWindow):
 
     def __init__(self):
         #inits blank textbox content
-        self.textDirec = ""
+        # self.textDirec = ""
         QMainWindow.__init__(self)
 
         loadUi("vis.ui",self)
@@ -86,9 +92,11 @@ class mainWindow(QMainWindow):
         currentPath = QtCore.QDir.currentPath()
 
         dir = QtWidgets.QFileDialog.getExistingDirectory(self, "Select Folder", currentPath)
+        mutex.acquire()
         self.textDirec = current.relativeFilePath(dir)
 
         self.textEdit.setText(self.textDirec)
+        mutex.release()
 
     def print(self,str):
         cur_txt = str

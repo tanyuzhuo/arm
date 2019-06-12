@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import image
 import wholeDataTest
-
+import re
 import random
 from dython import nominal
 import time
@@ -203,6 +203,31 @@ class mainWindow(QMainWindow):
             # add list to ComboBox
             self.comboBox_Lib.addItems(library_names_list_string)
 
+            mainlib_list=[]
+            subset_library = []
+            vt_block = []
+            transistor_size = []
+
+            for i in library_names_list:
+                tmp_list = re.split('_', i)
+                mainlib_list.append(tmp_list[0])
+                subset_library.append(tmp_list[1])
+                vt_block.append(tmp_list[2])
+                transistor_size.append(tmp_list[3])
+
+
+            mainlib_list_f = list(dict.fromkeys(mainlib_list))
+            mainlib_list_string = [str(i) for i in mainlib_list_f]
+            subset_library_f=list(dict.fromkeys(subset_library))
+            subset_library_string = [str(i) for i in subset_library_f]
+            vt_block_f=list(dict.fromkeys(vt_block))
+            vt_block_string = [str(i) for i in vt_block_f]
+            transistor_size_f=list(dict.fromkeys(transistor_size))
+            transistor_size_string = [str(i) for i in transistor_size_f]
+            self.comboBox_Mainlib.addItems(mainlib_list_string)
+            self.comboBox_Sublib.addItems(subset_library_string)
+            self.comboBox_Vt.addItems(vt_block_string)
+            self.comboBox_Size.addItems(transistor_size_string)
 
 
             if dfmem.empty:
@@ -255,7 +280,11 @@ class mainWindow(QMainWindow):
             # add list to ComboBox
             self.comboBox_EmaVmin.addItems(ema_list_vmin_string)
 
+    def predict():
+        global dfstd,library_names_list
 
+
+        return
     def ml(self):
         global dfstd
         data=dfstd

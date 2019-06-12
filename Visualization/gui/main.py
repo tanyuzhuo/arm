@@ -77,8 +77,9 @@ class mainWindow(QMainWindow):
 
         self.comboBox_3.currentIndexChanged[str].connect(self.Sciprint)
         self.comboBox.currentIndexChanged[str].connect(self.print)
+        self.radioButton_Mem.toggled.connect(self.memsel)
+        self.radioButton_SC.toggled.connect(self.scsel)
 
-        self.pushButton_5.clicked.connect(self.predict)
     def preprocessing(self):
         self.thread = ProgressCheck()
         self.thread.change_value.connect(self.setProgressVal)
@@ -210,8 +211,8 @@ class mainWindow(QMainWindow):
         return
 
     def load(self):
-            global df,df2,dfstd,dfmem,dfmemckb,temp_list,voltage_list,library_names_list,ema_list_yield,volmem_list,split_list,split_list_vmin,mem_list,ema_list_vmin
-            global mainlib_list_f,vt_block_f,transistor_size_f
+            global df,df2,dfstd,dfmem,dfmemckb,temp_list,voltage_list,library_names_list,ema_list_yield,volmem_list
+            global mainlib_list_f,vt_block_f,transistor_size_f,split_list,split_list_vmin,mem_list,ema_list_vmin,ken
             dfstd = pd.read_csv('resultsPerDir/vminStd.csv')
 
             dftempf = dfstd.drop_duplicates(['Chip Temp'])
@@ -222,6 +223,7 @@ class mainWindow(QMainWindow):
             # add list to ComboBox
             self.comboBox_Temp.addItems(temp_list_string)
             self.comboBox_Temp_P.addItems(temp_list_string)
+            self.comboBox_Temp_P_2.addItems(temp_list_string)
 
             dfsplit_shmoo_stdf = dfstd.drop_duplicates(['Chip Type'])
             dfsplit_shmoo_std = dfsplit_shmoo_stdf['Chip Type']
@@ -230,6 +232,7 @@ class mainWindow(QMainWindow):
             self.comboBox_Split.addItems(split_list_vmin_string)
             self.comboBox_SciSplit.addItems(split_list_vmin_string)
             self.comboBox_SP.addItems(split_list_vmin_string)
+
 
             dfvolf = dfstd.drop_duplicates(['VDD (Range)'])
             dfvol = dfvolf['VDD (Range)']
@@ -296,6 +299,7 @@ class mainWindow(QMainWindow):
             self.comboBox_EmaYield.addItems(ema_list_string)
 
 
+
             df_ema_temp_samev = dfmem.loc[dfmem['VDDPE (Range)'] == dfmem['VDDCE (Range)']]
             dfvolmemf = df_ema_temp_samev.drop_duplicates(['VDDPE (Range)'])
             dfvolmem = dfvolmemf['VDDPE (Range)']
@@ -319,6 +323,7 @@ class mainWindow(QMainWindow):
             # add list to ComboBox
             self.comboBox_SplitVmin.addItems(split_list_string)
             self.comboBox_Split_2.addItems(split_list_string)
+            self.comboBox_SP_2.addItems(split_list_string)
 
             dfarchi = dfmemckb.drop_duplicates(['Architecture'])
             mem_list = dfarchi['Architecture'].values.tolist()
@@ -334,8 +339,64 @@ class mainWindow(QMainWindow):
             ema_list_vmin_string = [str(i) for i in ema_list_vmin]
             # add list to ComboBox
             self.comboBox_EmaVmin.addItems(ema_list_vmin_string)
+            self.comboBox_EMA1.addItems(ema_list_vmin_string)
 
-    def predict(self):
+            #add ken to comboBox
+            ken=[1,99]
+            ken_string = [str(i) for i in ken]
+            self.comboBox_KEN.addItems(ken_string)
+
+            return
+    def memsel(self):
+        radioButton_Mem = self.sender()
+        if radioButton_Mem.isChecked():
+            self.groupBox_Pmem.show()
+            self.groupBox_Pstd.hide()
+            try:
+                self.pushButton_5.clicked.disconnect()
+            except:
+                pass
+            self.pushButton_5.clicked.connect(self.mempredict)
+        return
+    def scsel(self):
+        radioButton_SC = self.sender()
+        if radioButton_SC.isChecked():
+            self.groupBox_Pstd.show()
+            self.groupBox_Pmem.hide()
+            try:
+                self.pushButton_5.clicked.disconnect()
+            except:
+                pass
+            self.pushButton_5.clicked.connect(self.scpredict)
+        return
+    def mempredict(self):
+        global ema_list_vmin,temp_list,split_list,ken
+
+        inxTemp = self.comboBox_Temp_P_2.currentIndex()
+        temperature = temp_list[inxTemp]
+
+        inxSplit = self.comboBox_SP_2.currentIndex()
+        process = split_list[inxSplit]
+
+        inxEma = self.comboBox_EMA1.currentIndex()
+        Ema = ema_list_vmin[inxEma]
+
+        inxKen = self.comboBox_KEN.currentIndex()
+        ken = ken_string[inxKen]
+
+        architecture = self.lineEdit.text()
+
+        # msg = QMessageBox()
+        # msg.setIcon(QMessageBox.Information)
+        # msg.setWindowTitle('Result')
+        # msg.setText('The Predicted Mem Voltage Value is '+ str(result)+' V')
+        #
+        # msg.setStandardButtons(QMessageBox.Cancel)
+        # exe = msg.exec_()
+
+
+        return
+    def scpredict(self):
         # global dfstd,library_names_list
         global temp_list,mainlib_list_f,vt_block_f,transistor_size_f,split_list_vmin
         inxTemp = self.comboBox_Temp_P.currentIndex()
@@ -412,7 +473,7 @@ class mainWindow(QMainWindow):
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)
         msg.setWindowTitle('Result')
-        msg.setText('The Predicted Voltage Value is '+ str(result)+' V')
+        msg.setText('The Predicted SC Voltage Value is '+ str(result)+' V')
 
         msg.setStandardButtons(QMessageBox.Cancel)
         exe = msg.exec_()
@@ -519,19 +580,26 @@ class mainWindow(QMainWindow):
 
            df_ff = dftemp_lib.loc[dftemp['Chip Type'] == 'FF']
            prob_list,vol_list = self.calc_prob(df_ff)
-           plt.plot(vol_list, prob_list, 'ys-')
+           plt.plot(vol_list, prob_list, 's-')
 
            df_tt = dftemp_lib.loc[dftemp['Chip Type'] == 'TT']
-           prob_list,vol_list = self.calc_prob(df_ff)
-           plt.plot(vol_list, prob_list, 'bs-')
+           prob_list,vol_list = self.calc_prob(df_tt)
+           plt.plot(vol_list, prob_list, 's-')
 
            df_ss = dftemp_lib.loc[dftemp['Chip Type'] == 'SS']
-           prob_list,vol_list = self.calc_prob(df_ff)
-           plt.plot(vol_list, prob_list, 'rs-')
+           prob_list,vol_list = self.calc_prob(df_ss)
+           plt.plot(vol_list, prob_list, 's-')
 
+           df_sf = dftemp_lib.loc[dftemp['Chip Type'] == 'SF']
+           prob_list,vol_list = self.calc_prob(df_sf)
+           plt.plot(vol_list, prob_list, 's-')
+
+           df_fs = dftemp_lib.loc[dftemp['Chip Type'] == 'FS']
+           prob_list,vol_list = self.calc_prob(df_fs)
+           plt.plot(vol_list, prob_list, 's-')
 
            plt.axvline(x=spec_vol,linestyle='dashed')
-           plt.legend(['FF','TT', 'SS','operating Spec'], loc='right')
+           plt.legend(['FF','TT', 'SS','SF','FS','operating Spec'], loc='right')
 
            plt.show()
            return

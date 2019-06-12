@@ -88,22 +88,30 @@ def sc_vmin_data(spec_vol):
        ax = fig.add_subplot(111)
        ax.set(xlabel='VDD(V)', ylabel='probability of pass(%)',
               title=library_name + ' at ' + str(temp) + ' ' + chr(176) + 'C')
-       # plt.axis([0, 1.0, 0, 105])
+
 
        df_ff = dftemp_lib.loc[dftemp['Chip Type'] == 'FF']
        prob_list,vol_list = calc_prob(df_ff)
-       plt.plot(vol_list, prob_list, 'ys-')
+       plt.plot(vol_list, prob_list, 's-')
 
-       df_ff = dftemp_lib.loc[dftemp['Chip Type'] == 'TT']
-       prob_list,vol_list = calc_prob(df_ff)
-       plt.plot(vol_list, prob_list, 'bs-')
+       df_tt = dftemp_lib.loc[dftemp['Chip Type'] == 'TT']
+       prob_list,vol_list = calc_prob(df_tt)
+       plt.plot(vol_list, prob_list, 's-')
 
-       df_ff = dftemp_lib.loc[dftemp['Chip Type'] == 'SS']
-       prob_list,vol_list = calc_prob(df_ff)
-       plt.plot(vol_list, prob_list, 'rs-')
+       df_ss = dftemp_lib.loc[dftemp['Chip Type'] == 'SS']
+       prob_list,vol_list = calc_prob(df_ss)
+       plt.plot(vol_list, prob_list, 's-')
+
+       df_sf = dftemp_lib.loc[dftemp['Chip Type'] == 'SF']
+       prob_list,vol_list = calc_prob(df_sf)
+       plt.plot(vol_list, prob_list, 's-')
+
+       df_fs = dftemp_lib.loc[dftemp['Chip Type'] == 'FS']
+       prob_list,vol_list = calc_prob(df_fs)
+       plt.plot(vol_list, prob_list, 's-')
 
        plt.axvline(x=spec_vol,linestyle='dashed')
-       plt.legend(['FF','TT', 'SS','operating Spec'], loc='right')
+       plt.legend(['FF','TT', 'SS','SF','FS','operating Spec'], loc='right')
 
        plt.show()
        return
@@ -299,6 +307,7 @@ def sc_shamoo_data_ss(v1,v2):
        dflib = dflibf['Test Item']
        library_names_list = dflib.values.tolist()
        rows = library_names_list
+       print(rows)
 
        #obtain columns
        vol_list = []
@@ -423,8 +432,6 @@ def memory_shamoo_data_ss(v1,v2):
                              rowLabels=rows[start_index:end_index],
                              colLabels=columns,
                              loc='center')
-       start_index = end_index
-       end_index += 30
 
        plt.show()
 
@@ -432,5 +439,5 @@ def memory_shamoo_data_ss(v1,v2):
 # sc_vmin_data(0.35)
 # mem_vmin_data_ss_one(0.6)
 # mem_vmin_data_ss_two(0.6)
-#sc_shamoo_data_ss(0.3,0.5)
+# sc_shamoo_data_ss(0.3,0.5)
 # memory_shamoo_data_ss(0.5,0.7)

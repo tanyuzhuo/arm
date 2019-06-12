@@ -1,15 +1,21 @@
 from PyQt5.QtWidgets import*
 from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtCore import QThread, pyqtSignal
 from PyQt5.uic import loadUi
-#from matplotlib.backends.backend_qt5agg import (NavigationToolbar2QT as NavigationToolbar)
+
+from joblib import load
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 import image
 import wholeDataTest
 import re
 import random
+import os
+
 from dython import nominal
 import time
 import seaborn as sns
@@ -17,38 +23,30 @@ from matplotlib.ticker import MultipleLocator
 from matplotlib.ticker import MaxNLocator
 from scipy import stats
 
-dfstd = pd.DataFrame()
-dfmem = pd.DataFrame()
-dfmemckb = pd.DataFrame()
 
-self.textDirec = ""
-
-mutex.lock = threading.lock()
 
 class ProgressCheck(QThread):
+
      change_value = pyqtSignal(int)
-     # running = False
-     # def __init__(self,parent=None):
-     #     super(ProgressCheck,self).__init__(parent)
-     #     self.running = True
+
      def run(self):
+         global textDirec
          try:
-             #init class
-             mutex.acquire()
-             wholeDataTestClass = wholeDataTest.wholeDataTest(self.textDirec)
-             mutex.release()
-             #collect all csv files
+
+             wholeDataTestClass = wholeDataTest.wholeDataTest(textDirec)
+
              wholeDataTestClass.collectFiles()
-             #init processing info
+
              numberOfFiles = wholeDataTestClass.processAllCSVInit()
 
-             #loop and process each file
+
              for i in range(numberOfFiles):
                  #update status bar here
 
 
-                 statusPercent = i/numberOfFiles
+                 statusPercent = (i/numberOfFiles)*100
                  self.change_value.emit(statusPercent)
+
 
                  wholeDataTestClass.processIndivCSV(i)
              #print test meta info
@@ -63,22 +61,24 @@ class ProgressCheck(QThread):
 class mainWindow(QMainWindow):
 
     def __init__(self):
-        #inits blank textbox content
-        # self.textDirec = ""
+
         QMainWindow.__init__(self)
 
         loadUi("vis.ui",self)
+        self.setWindowTitle("Arm Workflow Data Visualisation & Science V0.5")
         self.toolButton.clicked.connect(self.files)
 
         self.pushButton_Process.clicked.connect(self.preprocessing)
 
         self.pushButton_2.clicked.connect(self.load)
+        self.progressBar.setValue(0)
         self.progressBar.setMaximum(100)
+
+
+        self.comboBox_3.currentIndexChanged[str].connect(self.Sciprint)
         self.comboBox.currentIndexChanged[str].connect(self.print)
-        self.setWindowTitle("Arm Workflow Data Visualisation & Science V0.5")
 
-        self.pushButton.clicked.connect(self.ml3)
-
+        self.pushButton_5.clicked.connect(self.predict)
     def preprocessing(self):
         self.thread = ProgressCheck()
         self.thread.change_value.connect(self.setProgressVal)
@@ -88,15 +88,48 @@ class mainWindow(QMainWindow):
     def setProgressVal(self,val):
         self.progressBar.setValue(val)
     def files(self):
+        global textDirec
         current = QtCore.QDir.current()
         currentPath = QtCore.QDir.currentPath()
 
         dir = QtWidgets.QFileDialog.getExistingDirectory(self, "Select Folder", currentPath)
-        mutex.acquire()
-        self.textDirec = current.relativeFilePath(dir)
 
-        self.textEdit.setText(self.textDirec)
-        mutex.release()
+        textDirec = current.relativeFilePath(dir)
+
+        self.textEdit.setText(textDirec)
+
+    def Sciprint(self,str):
+        cur_txt = str
+        if cur_txt == 'Boxplots of Observed SC Vmin by Process and Temperature':
+            try:
+                self.pushButton_Sci.clicked.disconnect()
+            except:
+                pass
+            self.pushButton_Sci.clicked.connect(self.ml)
+        if cur_txt == 'Boxplots of Observed SC Vmin by Library and Temperature':
+            self.groupBox_Sci.show()
+            try:
+                self.pushButton_Sci.clicked.disconnect()
+            except:
+                pass
+            self.pushButton_Sci.clicked.connect(self.ml2)
+        else:
+            self.groupBox_Sci.hide()
+
+        if cur_txt == 'Correlation Box Graph':
+            try:
+                self.pushButton_Sci.clicked.disconnect()
+            except:
+                pass
+            self.pushButton_Sci.clicked.connect(self.ml3)
+        if cur_txt == 'Leakage Relation Graph':
+            try:
+                self.pushButton_Sci.clicked.disconnect()
+            except:
+                pass
+            self.pushButton_Sci.clicked.connect(self.ml4)
+
+        return
 
     def print(self,str):
         cur_txt = str
@@ -176,10 +209,10 @@ class mainWindow(QMainWindow):
             self.groupBox_MemShmoo.hide()
         return
 
-    def load(self,text):
-            global dfstd,dfmem,dfmemckb,temp_list,voltage_list,library_names_list,ema_list_yield,volmem_list,split_list,split_list_vmin,mem_list,ema_list_vmin
-            if dfstd.empty:
-              dfstd = pd.read_csv('resultsPerDir/vminStd.csv')
+    def load(self):
+            global df,df2,dfstd,dfmem,dfmemckb,temp_list,voltage_list,library_names_list,ema_list_yield,volmem_list,split_list,split_list_vmin,mem_list,ema_list_vmin
+            global mainlib_list_f,vt_block_f,transistor_size_f
+            dfstd = pd.read_csv('resultsPerDir/vminStd.csv')
 
             dftempf = dfstd.drop_duplicates(['Chip Temp'])
             dftemplib = dftempf['Chip Temp']
@@ -188,12 +221,15 @@ class mainWindow(QMainWindow):
             temp_list_string = [str(i) for i in temp_list]
             # add list to ComboBox
             self.comboBox_Temp.addItems(temp_list_string)
+            self.comboBox_Temp_P.addItems(temp_list_string)
 
             dfsplit_shmoo_stdf = dfstd.drop_duplicates(['Chip Type'])
             dfsplit_shmoo_std = dfsplit_shmoo_stdf['Chip Type']
             split_list_vmin = dfsplit_shmoo_std.values.tolist()
             split_list_vmin_string = [str(i) for i in split_list_vmin]
             self.comboBox_Split.addItems(split_list_vmin_string)
+            self.comboBox_SciSplit.addItems(split_list_vmin_string)
+            self.comboBox_SP.addItems(split_list_vmin_string)
 
             dfvolf = dfstd.drop_duplicates(['VDD (Range)'])
             dfvol = dfvolf['VDD (Range)']
@@ -237,9 +273,20 @@ class mainWindow(QMainWindow):
             self.comboBox_Vt.addItems(vt_block_string)
             self.comboBox_Size.addItems(transistor_size_string)
 
+            df=dfstd.copy()
+            df.dropna(subset=['Shmoo Value'], inplace = True)
+            df.drop(['File Index', 'Test Number', 'Period (Range)', 'DVDD (Range)', 'VDD (Range)', 'Result'], axis=1, inplace = True)
+            df.columns = ['Process', 'Temperature', 'Library', 'Vmin']
+            df['Temperature'] = pd.to_numeric(df['Temperature'], errors = 'coerce').fillna(-40.0).astype(float)
 
-            if dfmem.empty:
-              dfmem = pd.read_csv('resultsPerDir/mem.csv',dtype={"Chip Temp": str})
+            df2 = pd.read_csv('resultsPerDir/leakage.csv')
+            df2.drop(['File Index', 'DVDD (Range)', 'Period (Range)', 'VDD (Range)'], axis=1, inplace = True)
+            df2['Value'] = df2['Value'].map(lambda x: x.rstrip('uA'))
+            df2['Value'] = pd.to_numeric(df2['Value']).astype(float)
+
+
+
+            dfmem = pd.read_csv('resultsPerDir/mem.csv',dtype={"Chip Temp": str})
             dfemaf = dfmem.drop_duplicates(['EMA#1'])
             dfema = dfemaf['EMA#1']
             # transform into list
@@ -261,8 +308,8 @@ class mainWindow(QMainWindow):
             #mem Vmin operations
             #
             #
-            if dfmemckb.empty:
-              dfmemckb = pd.read_csv('resultsPerDir/vminCkb.csv')
+
+            dfmemckb = pd.read_csv('resultsPerDir/vminCkb.csv')
 
             dfsplit = dfmemckb.drop_duplicates(['Chip Type'])
             dfsplitlib = dfsplit['Chip Type']
@@ -288,94 +335,134 @@ class mainWindow(QMainWindow):
             # add list to ComboBox
             self.comboBox_EmaVmin.addItems(ema_list_vmin_string)
 
-    def predict():
-        global dfstd,library_names_list
+    def predict(self):
+        # global dfstd,library_names_list
+        global temp_list,mainlib_list_f,vt_block_f,transistor_size_f,split_list_vmin
+        inxTemp = self.comboBox_Temp_P.currentIndex()
+        temperature = temp_list[inxTemp]
+        if temperature == 'M40':
+           temperature = -40.0
 
+        inxLib = self.comboBox_Mainlib.currentIndex()
+        mainLib = mainlib_list_f[inxLib]
 
+        inxVt = self.comboBox_Vt.currentIndex()
+        transistorVtBlock = vt_block_f[inxVt]
+
+        inxSize = self.comboBox_Size.currentIndex()
+        transistorSize = transistor_size_f[inxSize]
+
+        inxSplit = self.comboBox_SP.currentIndex()
+        process = split_list_vmin[inxSplit]
+        clf = load('RFVminBasic (2).joblib')
+        # initialize with temp
+        processValues = [0,0,0,0,0]
+        transistorVtBlockValues = [0,0,0]
+        inputVector = [float(temperature)/150.0]
+
+        # main lib
+        if mainLib == 'sc7p5mcpp96p':
+          inputVector.append(1)
+        else:
+          inputVector.append(0)
+
+        # size
+        if transistorSize == 'c16':
+          inputVector.append(0)
+        elif transistorSize == 'c18':
+          inputVector.append(1)
+        elif transistorSize == 'c20':
+          inputVector.append(2)
+        else:
+          inputVector.append(3)
+
+        # process
+        if process == 'FF':
+          processValues[0] = 1
+        elif process == 'FS':
+          processValues[1] = 1
+        elif process == 'SF':
+          processValues[2] = 1
+        elif process == 'SS':
+          processValues[3] = 1
+        else:
+          processValues[4] = 1
+        inputVector.extend(processValues)
+
+        # Vt block
+        if transistorVtBlock == 'lvt':
+          transistorVtBlockValues[0] = 1
+        elif transistorVtBlock == 'svt':
+          transistorVtBlockValues[1] = 1
+        else:
+          transistorVtBlockValues[2] = 1
+        inputVector.extend(transistorVtBlockValues)
+
+        a = np.asarray(inputVector)
+        a = a.reshape(1, -1)
+        result = float(clf.predict(a))
+
+        #img_file = os.path.expanduser("tulip.png")
+
+        #figure(figsize = (10,20))
+        img = plt.imread('model1summary.png', 0)
+        imgplot = plt.imshow(img)
+        plt.show()
+
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Information)
+        msg.setWindowTitle('Result')
+        msg.setText('The Predicted Voltage Value is '+ str(result)+' V')
+
+        msg.setStandardButtons(QMessageBox.Cancel)
+        exe = msg.exec_()
         return
     def ml(self):
-        global dfstd
-        data=dfstd
-        data['Chip Temp'] = pd.to_numeric(data['Chip Temp'], errors = 'coerce').fillna(-40.0).astype(float)
+        global df
 
-        # used to create sub-dataframes
-        temperatureList = []
-        vminList = []
-        processList = []
-        libraryList = []
-        for i in range(len(data)): # iterate through csv to pick required data
-
-            if data['Shmoo Value'][i] != -9.9:
-                temperatureList.append(data['Chip Temp'][i])
-                vminList.append(data['Shmoo Value'][i])
-                processList.append(data['Chip Type'][i])
-                libraryList.append(data['Test Item'][i])
-
-        # First Datatict does not include the library data
-        dataDict = {'Library':libraryList, 'Vmin':vminList , 'Temperature':temperatureList, 'Process':processList}
-        df = pd.DataFrame(dataDict)
-
-        #print(df.head()) # (for debugging purposes)
 
         # boxplot -> process comparison
         flatui = ["#9b59b6", "#34495e", "#95a5a6", "#e74c3c"]
         plt.figure(figsize=(13,10))
         sns.boxplot(x='Process', y='Vmin', data=df, hue='Temperature', showmeans=True, palette = flatui)
-        plt.title('Boxplots of observed SC Vmin by Process and Temperature', fontsize=22)
+        plt.title('Boxplots of observed Vmin by Process and Temperature', fontsize=22)
         plt.show()
 
 
         return
+
     def ml2(self):
-        global dfstd
-        data=dfstd
-        data['Chip Temp'] = pd.to_numeric(data['Chip Temp'], errors = 'coerce').fillna(-40.0).astype(float)
-
-        # used to create sub-dataframes
-        temperatureList = []
-        vminList = []
-        processList = []
-        libraryList = []
-        for i in range(len(data)): # iterate through csv to pick required data
-
-            if data['Shmoo Value'][i] != -9.9:
-                temperatureList.append(data['Chip Temp'][i])
-                vminList.append(data['Shmoo Value'][i])
-                processList.append(data['Chip Type'][i])
-                libraryList.append(data['Test Item'][i])
-
-        # First Datatict does not include the library data
-        dataDict = {'Library':libraryList, 'Vmin':vminList , 'Temperature':temperatureList, 'Process':processList}
-        df = pd.DataFrame(dataDict)
-
+        global df
         # boxplot -> library comparison
-        g = sns.catplot(x='Library', y='Vmin', data=df, col="Process", height = 10, aspect = 2, hue = 'Temperature', kind='box')
-        g.set_xticklabels(rotation=85)
+
+        inxSplit = self.comboBox_SciSplit.currentIndex()
+        split = split_list_vmin[inxSplit]
+        libPlot = df.loc[df['Process'] == split]
+
+        plt.figure(figsize=(20, 10))
+        sns.boxplot(x='Library', y='Vmin', data=libPlot, hue = 'Temperature', showmeans=True)
+        plt.xticks(rotation=60)
+        plt.title('Vmin by library for the ' + split + ' process.', fontsize=22)
         plt.show()
 
         return
+
     def ml3(self):
-        global dfstd
-        data=dfstd
-        data['Chip Temp'] = pd.to_numeric(data['Chip Temp'], errors = 'coerce').fillna(-40.0).astype(float)
-
-        # used to create sub-dataframes
-        temperatureList = []
-        vminList = []
-        processList = []
-        libraryList = []
-        for i in range(len(data)): # iterate through csv to pick required data
-
-            if data['Shmoo Value'][i] != -9.9:
-                temperatureList.append(data['Chip Temp'][i])
-                vminList.append(data['Shmoo Value'][i])
-                processList.append(data['Chip Type'][i])
-                libraryList.append(data['Test Item'][i])
-
-        # First Datatict does not include the library data
-        dataDict = {'Library':libraryList, 'Vmin':vminList , 'Temperature':temperatureList, 'Process':processList}
-        df = pd.DataFrame(dataDict)
+        global df
         nominal.associations(df, nominal_columns=['Process','Library'], theil_u= True)
+        return
+    def ml4(self):
+        global df2
+
+
+
+        # scatter plot
+
+        sns.catplot(x="Chip Type", y="Value", data=df2, col = 'Chip Temp', hue = 'Leakage Test Type')
+        plt.show()
+
+
+
         return
 
     def calc_prob(self,df):
@@ -412,6 +499,7 @@ class mainWindow(QMainWindow):
            spec_vol = self.vspecStd.value()
            inxTemp = self.comboBox_Temp.currentIndex()
            temp = temp_list[inxTemp]
+
            dftemp = dfstd.loc[dfstd['Chip Temp'] == temp]
 
 
@@ -524,6 +612,7 @@ class mainWindow(QMainWindow):
 
         plt.show()
         return
+
     def mem_vmin_data_ema(self):
         global temp_list,dfmem,dfmemckb,mem_list,split_list
 
@@ -540,12 +629,6 @@ class mainWindow(QMainWindow):
         mem_instance= mem_list[inxMem]
         dftemp_mem = dftemp.loc[dftemp['Architecture'] == mem_instance]
 
-        # #finding vdd list for x-axis and calc prob of pass
-        #
-        # tmp_df_ss = dfmem.loc[dfmem['Chip Type'] == split]
-        # tmp_df_ss_samev = tmp_df_ss.loc[tmp_df_ss['VDDPE (Range)'] == tmp_df_ss['VDDCE (Range)']]
-        # dfvol = tmp_df_ss_samev.drop_duplicates(['VDDPE (Range)'])
-        # vol_list = sorted(dfvol['VDDPE (Range)'].values.tolist())
 
         # finding emas
         dfemas = dftemp_mem.drop_duplicates(['EMA#1'])
@@ -587,14 +670,7 @@ class mainWindow(QMainWindow):
         default_ema = ema_list_vmin[inxEma]
         dftemp_ema = dftemp.loc[dftemp['EMA#1'] == default_ema]
 
-        # #finding vdd list for x-axis and calc prob of pass
-        #
-        # tmp_df_ss = dfmem.loc[dfmem['Chip Type'] == split]
-        # tmp_df_ss_samev = tmp_df_ss.loc[tmp_df_ss['VDDPE (Range)'] == tmp_df_ss['VDDCE (Range)']]
-        # dfvol = tmp_df_ss_samev.drop_duplicates(['VDDPE (Range)'])
-        # vol_list = sorted(dfvol['VDDPE (Range)'].values.tolist())
 
-        # finding memory instance
         dfmems = dftemp_ema.drop_duplicates(['Architecture'])
         mem_list = dfmems['Architecture'].values.tolist()
 

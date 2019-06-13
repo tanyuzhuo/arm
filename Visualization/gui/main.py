@@ -339,7 +339,11 @@ class mainWindow(QMainWindow):
             ema_list_vmin_string = [str(i) for i in ema_list_vmin]
             # add list to ComboBox
             self.comboBox_EmaVmin.addItems(ema_list_vmin_string)
-            self.comboBox_EMA1.addItems(ema_list_vmin_string)
+
+            #add ema for mem predict to comboBox
+            emapredict=[2,3,7]
+            emapredict_string = [str(i) for i in emapredict]
+            self.comboBox_EMA1.addItems(emapredict_string)
 
             #add ken to comboBox
             ken=[1,99]
@@ -370,7 +374,7 @@ class mainWindow(QMainWindow):
             self.pushButton_5.clicked.connect(self.scpredict)
         return
     def mempredict(self):
-        global ema_list_vmin,temp_list,split_list,ken
+        global emapredict,temp_list,split_list,ken
 
         inxTemp = self.comboBox_Temp_P_2.currentIndex()
         temperature = temp_list[inxTemp]
@@ -379,20 +383,82 @@ class mainWindow(QMainWindow):
         process = split_list[inxSplit]
 
         inxEma = self.comboBox_EMA1.currentIndex()
-        Ema = ema_list_vmin[inxEma]
+        EMA1 = ema_list_vmin[inxEma]
 
         inxKen = self.comboBox_KEN.currentIndex()
-        ken = ken_string[inxKen]
+        KEN = ken[inxKen]
 
         architecture = self.lineEdit.text()
 
-        # msg = QMessageBox()
-        # msg.setIcon(QMessageBox.Information)
-        # msg.setWindowTitle('Result')
-        # msg.setText('The Predicted Mem Voltage Value is '+ str(result)+' V')
-        #
-        # msg.setStandardButtons(QMessageBox.Cancel)
-        # exe = msg.exec_()
+        clf = load('RFVminMemShort (1).joblib')
+
+        EMA1Vals = [0,0,0]
+        architectureTrimmed = re.search('[A-Za-z0-9]+', architecture).group(0)
+        archTypes = ['RA1HD', 'RA1HDA', 'RA1UHD', 'RA1UHDA', 'RA2PUHD', 'RA2PUHDA', 'RADPUHD', 'RF1HD','RF1HDA'
+         , 'RF1UHD', 'RF2AHS', 'RF2HS','ROV', 'ROVA', 'SRAMSPHD', 'SRAMSPUHD', 'cln16ffcll']
+        processValues = [0,0,0,0,0]
+
+        oneHotArch = np.zeros(17)
+
+        # initialize with temperature
+        inputVector = [float(temperature)/150.0]
+
+        for i in range(len(archTypes)):
+          if archTypes[i] == architectureTrimmed:
+            oneHotArch[i] = 1
+
+        inputVector.extend(oneHotArch)
+
+        # process
+        if process == 'FF':
+          processValues[0] = 1
+        elif process == 'FS':
+          processValues[1] = 1
+        elif process == 'SF':
+          processValues[2] = 1
+        elif process == 'SS':
+          processValues[3] = 1
+        else:
+          processValues[4] = 1
+        inputVector.extend(processValues)
+
+        if EMA1 == 2:
+          EMA1Vals[0] = 1
+        elif EMA1 == 3:
+          EMA1Vals[1] = 1
+        else:
+          EMA1Vals[2] = 1
+        inputVector.extend(EMA1Vals)
+
+        if KEN == 99:
+          inputVector.extend([0,1])
+        else:
+          inputVector.extend([1,0])
+
+
+
+
+        inputVector = np.asarray(inputVector)
+
+        inputVector = inputVector.reshape(1, -1)
+
+        result = float(clf.predict(inputVector))
+
+
+        img1 = plt.imread('Screenshot 1.png', 0)
+        img2 = plt.imread('Screenshot 2.png', 0)
+        plt.subplot(2,1,1)
+        plt.imshow(img1)
+        plt.subplot(2,1,2)
+        plt.imshow(img2)
+        plt.show()
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Information)
+        msg.setWindowTitle('Result')
+        msg.setText('The Predicted Mem Voltage Value is '+ str(result)+' V')
+
+        msg.setStandardButtons(QMessageBox.Cancel)
+        exe = msg.exec_()
 
 
         return

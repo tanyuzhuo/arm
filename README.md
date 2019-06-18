@@ -37,7 +37,7 @@ python3 main.py
 ```
 ## Preprocessing
 ## GUI Design
-## Data Visualiztion
+## Data Visualization
 ## Data Science
 ## Contributing
 

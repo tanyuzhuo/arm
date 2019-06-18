@@ -1,5 +1,5 @@
 # ARM Data Visualization and Data Science
-This repository contains an improved and automated approach to improve ARM's chip data workflow and with provide further data insights analysis.
+This repository contains an improved and automated approach to improve ARM's chip data workflow and provides further chip data insight analysis.
 
 Arm is the world’s leading semiconductor IP company, with 125 billion chips shipped to date and these devices are used by over 70% of the global population. 
 

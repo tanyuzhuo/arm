@@ -18,10 +18,12 @@ You will need [Python 3](https://www.python.org) installed, a data folder provid
 
 Install the necessary packages:
 ```
+git clone https://github.com/shakedzy/dython.git
+pip install ./dython
+
 pip install pandas
 pip install numpy
 pip install pyqt5
-pip install dython
 pip install joblib
 ```
 

@@ -3,9 +3,7 @@ from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtCore import QThread, pyqtSignal
 from PyQt5.uic import loadUi
-
 from joblib import load
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,15 +13,12 @@ import wholeDataTest
 import re
 import random
 import os
-
 from dython import nominal
 import time
 import seaborn as sns
 from matplotlib.ticker import MultipleLocator
 from matplotlib.ticker import MaxNLocator
 from scipy import stats
-
-
 
 class ProgressCheck(QThread):
 
@@ -61,19 +56,18 @@ class ProgressCheck(QThread):
 class mainWindow(QMainWindow):
 
     def __init__(self):
-
+        #initialize main window and load GUI from Qt Designer
         QMainWindow.__init__(self)
-
         loadUi("vis.ui",self)
         self.setWindowTitle("Arm Workflow Data Visualisation & Science V0.5")
+
+        #button connections to different command funcions
         self.toolButton.clicked.connect(self.files)
-
         self.pushButton_Process.clicked.connect(self.preprocessing)
-
         self.pushButton_2.clicked.connect(self.load)
+
         self.progressBar.setValue(0)
         self.progressBar.setMaximum(100)
-
 
         self.comboBox_3.currentIndexChanged[str].connect(self.Sciprint)
         self.comboBox.currentIndexChanged[str].connect(self.print)
@@ -117,7 +111,7 @@ class mainWindow(QMainWindow):
         else:
             self.groupBox_Sci.hide()
 
-        if cur_txt == 'Correlation Box Graph':
+        if cur_txt == 'Std Cell Vmin Correlation Matrix':
             try:
                 self.pushButton_Sci.clicked.disconnect()
             except:
@@ -212,7 +206,7 @@ class mainWindow(QMainWindow):
 
     def load(self):
             global df,df2,dfstd,dfmem,dfmemckb,temp_list,voltage_list,library_names_list,ema_list_yield,volmem_list
-            global mainlib_list_f,vt_block_f,transistor_size_f,split_list,split_list_vmin,mem_list,ema_list_vmin,ken
+            global mainlib_list_f,vt_block_f,transistor_size_f,split_list,split_list_vmin,mem_list,ema_list_vmin,emapredict,ken
             dfstd = pd.read_csv('resultsPerDir/vminStd.csv')
 
             dftempf = dfstd.drop_duplicates(['Chip Temp'])
@@ -332,21 +326,28 @@ class mainWindow(QMainWindow):
             # add list to ComboBox
             self.comboBox_Instance.addItems(mem_list_string)
 
+
+            # dfemalib = dfmemckb['EMA#1'].unique()
+
             dfema = dfmemckb.drop_duplicates(['EMA#1'])
             dfemalib = dfema['EMA#1']
+
             # transform into list
             ema_list_vmin = dfemalib.values.tolist()
-            ema_list_vmin_string = [str(i) for i in ema_list_vmin]
+            ema_list_vmin_string = [str(i) for i in ema_list_vmin ]
             # add list to ComboBox
             self.comboBox_EmaVmin.addItems(ema_list_vmin_string)
 
             #add ema for mem predict to comboBox
-            emapredict=[2,3,7]
+
+            emapredictf = list(map(lambda x : x.lstrip('A'),ema_list_vmin))
+            emapredict = list(map(int,emapredictf))
             emapredict_string = [str(i) for i in emapredict]
             self.comboBox_EMA1.addItems(emapredict_string)
 
             #add ken to comboBox
-            ken=[1,99]
+
+            ken= list(dfmemckb['KEN'].unique())
             ken_string = [str(i) for i in ken]
             self.comboBox_KEN.addItems(ken_string)
 
@@ -383,7 +384,7 @@ class mainWindow(QMainWindow):
         process = split_list[inxSplit]
 
         inxEma = self.comboBox_EMA1.currentIndex()
-        EMA1 = ema_list_vmin[inxEma]
+        EMA1 = emapredict[inxEma]
 
         inxKen = self.comboBox_KEN.currentIndex()
         KEN = ken[inxKen]
@@ -392,11 +393,15 @@ class mainWindow(QMainWindow):
 
         clf = load('RFVminMemShort (1).joblib')
 
-        EMA1Vals = [0,0,0]
+        EMA1Vals = list(np.zeros(len(emapredict), dtype = int))
+
         architectureTrimmed = re.search('[A-Za-z0-9]+', architecture).group(0)
         archTypes = ['RA1HD', 'RA1HDA', 'RA1UHD', 'RA1UHDA', 'RA2PUHD', 'RA2PUHDA', 'RADPUHD', 'RF1HD','RF1HDA'
          , 'RF1UHD', 'RF2AHS', 'RF2HS','ROV', 'ROVA', 'SRAMSPHD', 'SRAMSPUHD', 'cln16ffcll']
-        processValues = [0,0,0,0,0]
+
+
+        processValues = list(np.zeros(len(split_list), dtype = int))
+        # processValues = [0,0,0,0,0]
 
         oneHotArch = np.zeros(17)
 

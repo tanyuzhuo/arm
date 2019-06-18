@@ -382,6 +382,8 @@ class mainWindow(QMainWindow):
                 pass
             self.pushButton_5.clicked.connect(self.scpredict)
         return
+    
+    # predicts Memory Vmin from user input
     def mempredict(self):
         global emapredict,temp_list,split_list,ken
 
@@ -404,26 +406,31 @@ class mainWindow(QMainWindow):
 
         EMA1Vals = list(np.zeros(len(emapredict), dtype = int))
 
+     
+        # Select only the first half of the memory architecture (more specific than architecture type
+        # but less specific than the whole architecture) because there are too many individual ones
         architectureTrimmed = re.search('[A-Za-z0-9]+', architecture).group(0)
-        archTypes = ['RA1HD', 'RA1HDA', 'RA1UHD', 'RA1UHDA', 'RA2PUHD', 'RA2PUHDA', 'RADPUHD', 'RF1HD','RF1HDA'
-         , 'RF1UHD', 'RF2AHS', 'RF2HS','ROV', 'ROVA', 'SRAMSPHD', 'SRAMSPUHD', 'cln16ffcll']
+        archTypes = list(set(architectureTrimmed)) # return only unique values
 
-
+        # used to one hot encore process values in feature vector (all are set to 0, and 1 value
+        # will be set to 1, depending on the user input)
         processValues = list(np.zeros(len(split_list), dtype = int))
         # processValues = [0,0,0,0,0]
 
-        oneHotArch = np.zeros(17)
+        # Same as above but for architecture
+        oneHotArch = np.zeros(len(archTypes)
 
         # initialize with temperature
         inputVector = [float(temperature)/150.0]
 
+        #
         for i in range(len(archTypes)):
           if archTypes[i] == architectureTrimmed:
             oneHotArch[i] = 1
 
         inputVector.extend(oneHotArch)
 
-        # process
+        # one hot encoding the process value
         if process == 'FF':
           processValues[0] = 1
         elif process == 'FS':
@@ -436,6 +443,7 @@ class mainWindow(QMainWindow):
           processValues[4] = 1
         inputVector.extend(processValues)
 
+        # one hot encoding EMA#1
         if EMA1 == 2:
           EMA1Vals[0] = 1
         elif EMA1 == 3:
@@ -443,7 +451,7 @@ class mainWindow(QMainWindow):
         else:
           EMA1Vals[2] = 1
         inputVector.extend(EMA1Vals)
-
+        # idem for KEN
         if KEN == 99:
           inputVector.extend([0,1])
         else:
@@ -451,16 +459,16 @@ class mainWindow(QMainWindow):
 
 
 
-
+        # Reshape input vector to apply to sklearn model
         inputVector = np.asarray(inputVector)
-
         inputVector = inputVector.reshape(1, -1)
-
         result = float(clf.predict(inputVector))
 
-
+        # Summary plots of model performance during training for guidance purposes
         img1 = plt.imread('Screenshot 1.png', 0)
         img2 = plt.imread('Screenshot 2.png', 0)
+
+        # Plot the images and the box including the predicted value
         plt.subplot(2,1,1)
         plt.imshow(img1)
         plt.subplot(2,1,2)
@@ -470,12 +478,13 @@ class mainWindow(QMainWindow):
         msg.setIcon(QMessageBox.Information)
         msg.setWindowTitle('Result')
         msg.setText('The Predicted Mem Voltage Value is '+ str(result)+' V')
-
+                              
         msg.setStandardButtons(QMessageBox.Cancel)
         exe = msg.exec_()
 
 
         return
+    # equivalent function to "mempredict", only for standard cell
     def scpredict(self):
         # global dfstd,library_names_list
         global temp_list,mainlib_list_f,vt_block_f,transistor_size_f,split_list_vmin
@@ -503,13 +512,14 @@ class mainWindow(QMainWindow):
         transistorVtBlockValues = [0,0,0]
         inputVector = [float(temperature)/150.0]
 
-        # main lib
+        # main library name
+        # this is dataset-dependant and hence hard coded
         if mainLib == 'sc7p5mcpp96p':
           inputVector.append(1)
         else:
           inputVector.append(0)
 
-        # size
+        # transistor size
         if transistorSize == 'c16':
           inputVector.append(0)
         elif transistorSize == 'c18':
@@ -560,24 +570,23 @@ class mainWindow(QMainWindow):
         msg.setStandardButtons(QMessageBox.Cancel)
         exe = msg.exec_()
         return
+        
+    # Boxplot of Vmin distribution by Process split and Temperature
     def ml(self):
         global df
 
 
-        # boxplot -> process comparison
+        # Boxplot of Vmin distribution by Process split and Temperature
         flatui = ["#9b59b6", "#34495e", "#95a5a6", "#e74c3c"]
         plt.figure(figsize=(13,10))
         sns.boxplot(x='Process', y='Vmin', data=df, hue='Temperature', showmeans=True, palette = flatui)
         plt.title('Boxplots of observed Vmin by Process and Temperature', fontsize=22)
         plt.show()
 
-
         return
-
+    # Boxplot of Vmin distribution by Process split and Temperature on the library level
     def ml2(self):
         global df
-        # boxplot -> library comparison
-
         # reading inputs from the comboBox
         inxSplit = self.comboBox_SciSplit.currentIndex()
         split = split_list_vmin[inxSplit]
@@ -590,46 +599,44 @@ class mainWindow(QMainWindow):
         plt.show()
 
         return
-
+    # Correlation matrix showing influence of different parameters on SC Vmin
     def ml3(self):
         global df
         nominal.associations(df, nominal_columns=['Process','Library'], theil_u= True)
         return
+                              
+    # scatter plot of pin leakage by temperature and process split
     def ml4(self):
         global df2
-        # scatter plot
 
         sns.catplot(x="Chip Type", y="Value", data=df2, col = 'Chip Temp', hue = 'Leakage Test Type')
         plt.show()
-
         return
 
-    """
-    used to calculate prob. of pass
-    """
+    # used to calculate prob. of pass
     def calc_prob(self,df):
 
-           df_shamoo = df.loc[df['Shmoo Value'].isnull() == False]
-           shamoo_value = df_shamoo['Shmoo Value']
-           shamoo_value_list = shamoo_value.values.tolist()
+           df_vmin = df.loc[df['Shmoo Value'].isnull() == False]
+           vmin_value = df_vmin['Shmoo Value']
+           vmin_value_list = vmin_value.values.tolist()
            #obtain x-axis
            voltage_list = []
-           v1 = min(shamoo_value_list) - 0.1
-           v2 = max(shamoo_value_list) + 0.1
+           v1 = min(vmin_value_list) - 0.1
+           v2 = max(vmin_value_list) + 0.1
            tmpv = v1
            while (tmpv <= v2):
                   voltage_list.append(tmpv)
                   tmpv += 0.02
                   tmpv = round(tmpv, 2)
 
-           # percentage = No. of (shamoo value < each vdd value) / total number of shamoo value
+           # percentage = No. of (vmin values < each vdd value) / total number of vmin values
            prob_list = []
            count = 0
            for vol in voltage_list:
-                  for value in shamoo_value_list:
+                  for value in vmin_value_list:
                          if (value < vol):
                                 count += 1
-                  prob_list.append(100 * count / len(shamoo_value_list))
+                  prob_list.append(100 * count / len(vmin_value_list))
                   count = 0
            return prob_list,voltage_list
 

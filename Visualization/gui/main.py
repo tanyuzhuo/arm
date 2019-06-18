@@ -1,3 +1,4 @@
+#import necessary modules
 from PyQt5.QtWidgets import*
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QMessageBox
@@ -20,8 +21,11 @@ from matplotlib.ticker import MultipleLocator
 from matplotlib.ticker import MaxNLocator
 from scipy import stats
 
+#running progressbar in a separate thread to prevent gui freezing
 class ProgressCheck(QThread):
 
+
+     #emits integer progress value
      change_value = pyqtSignal(int)
 
      def run(self):
@@ -36,7 +40,7 @@ class ProgressCheck(QThread):
 
 
              for i in range(numberOfFiles):
-                 #update status bar here
+                 #update status bar
 
 
                  statusPercent = (i/numberOfFiles)*100
@@ -56,10 +60,11 @@ class ProgressCheck(QThread):
 class mainWindow(QMainWindow):
 
     def __init__(self):
+
         #initialize main window and load GUI from Qt Designer
         QMainWindow.__init__(self)
         loadUi("vis.ui",self)
-        self.setWindowTitle("Arm Workflow Data Visualisation & Science V0.5")
+        self.setWindowTitle("Arm Workflow Data Visualisation & Science V0.7")
 
         #button connections to different command funcions
         self.toolButton.clicked.connect(self.files)
@@ -69,34 +74,41 @@ class mainWindow(QMainWindow):
         self.progressBar.setValue(0)
         self.progressBar.setMaximum(100)
 
+        #displaying different sections based on inputs selected from the combobox or raido button
         self.comboBox_3.currentIndexChanged[str].connect(self.Sciprint)
         self.comboBox.currentIndexChanged[str].connect(self.print)
         self.radioButton_Mem.toggled.connect(self.memsel)
         self.radioButton_SC.toggled.connect(self.scsel)
 
     def preprocessing(self):
+        #preprocessing progress function connected to the progresscheck thread
         self.thread = ProgressCheck()
         self.thread.change_value.connect(self.setProgressVal)
         self.thread.start()
 
 
     def setProgressVal(self,val):
+
         self.progressBar.setValue(val)
+
     def files(self):
         global textDirec
+
+        #getting existing directory's file name
         current = QtCore.QDir.current()
         currentPath = QtCore.QDir.currentPath()
-
         dir = QtWidgets.QFileDialog.getExistingDirectory(self, "Select Folder", currentPath)
-
         textDirec = current.relativeFilePath(dir)
-
         self.textEdit.setText(textDirec)
 
     def Sciprint(self,str):
+
+        #getting selected combobox options string
         cur_txt = str
+        #connect to different graph functions based on selected options
         if cur_txt == 'Boxplots of Observed SC Vmin by Process and Temperature':
             try:
+                #disconnect previous pushButton status subscribtion
                 self.pushButton_Sci.clicked.disconnect()
             except:
                 pass
@@ -127,10 +139,14 @@ class mainWindow(QMainWindow):
         return
 
     def print(self,str):
+
+        #getting selected combobox options string
         cur_txt = str
+        #connect to different graph functions based on selected options
         if cur_txt == 'Stdcell Yield Data':
             self.groupBox_StdYield.show()
             try:
+                #disconnect previous pushButton status subscribtion
                 self.pushButton.clicked.disconnect()
             except:
                 pass
@@ -205,41 +221,37 @@ class mainWindow(QMainWindow):
         return
 
     def load(self):
+
+            #global parameters passed to different graph functions
             global df,df2,dfstd,dfmem,dfmemckb,temp_list,voltage_list,library_names_list,ema_list_yield,volmem_list
             global mainlib_list_f,vt_block_f,transistor_size_f,split_list,split_list_vmin,mem_list,ema_list_vmin,emapredict,ken
+
+            #read postprocessed csv vminStd file
             dfstd = pd.read_csv('resultsPerDir/vminStd.csv')
 
-            dftempf = dfstd.drop_duplicates(['Chip Temp'])
-            dftemplib = dftempf['Chip Temp']
-            # transform into list
-            temp_list = dftemplib.values.tolist()
+            #drop duplicated temperature options based on inputs
+            temp_list = list(dfstd['Chip Temp'].unique())
             temp_list_string = [str(i) for i in temp_list]
             # add list to ComboBox
             self.comboBox_Temp.addItems(temp_list_string)
             self.comboBox_Temp_P.addItems(temp_list_string)
             self.comboBox_Temp_P_2.addItems(temp_list_string)
 
-            dfsplit_shmoo_stdf = dfstd.drop_duplicates(['Chip Type'])
-            dfsplit_shmoo_std = dfsplit_shmoo_stdf['Chip Type']
-            split_list_vmin = dfsplit_shmoo_std.values.tolist()
+            #drop duplicated split type options based on inputs
+            split_list_vmin = list(dfstd['Chip Type'].unique())
             split_list_vmin_string = [str(i) for i in split_list_vmin]
             self.comboBox_Split.addItems(split_list_vmin_string)
             self.comboBox_SciSplit.addItems(split_list_vmin_string)
             self.comboBox_SP.addItems(split_list_vmin_string)
 
-
-            dfvolf = dfstd.drop_duplicates(['VDD (Range)'])
-            dfvol = dfvolf['VDD (Range)']
-            # transform into list
-            voltage_list = dfvol.values.tolist()
+            #drop duplicated voltage options based on inputs
+            voltage_list = list(dfstd['VDD (Range)'].unique())
             voltage_list_string = [str(i) for i in voltage_list]
             # add list to ComboBox
             self.comboBox_Voltage_StdYield.addItems(voltage_list_string)
 
-            dflibf = dfstd.drop_duplicates(['Test Item'])
-            dflib = dflibf['Test Item']
-            # transform into list
-            library_names_list = dflib.values.tolist()
+            #drop duplicated library options based on inputs
+            library_names_list = list(dfstd['Test Item'].unique())
             library_names_list_string = [str(i) for i in library_names_list]
             # add list to ComboBox
             self.comboBox_Lib.addItems(library_names_list_string)
@@ -249,6 +261,7 @@ class mainWindow(QMainWindow):
             vt_block = []
             transistor_size = []
 
+            #regex out different sub sections as inputs for data science
             for i in library_names_list:
                 tmp_list = re.split('_', i)
                 mainlib_list.append(tmp_list[0])
@@ -256,7 +269,7 @@ class mainWindow(QMainWindow):
                 vt_block.append(tmp_list[2])
                 transistor_size.append(tmp_list[3])
 
-
+            #create option lists
             mainlib_list_f = list(dict.fromkeys(mainlib_list))
             mainlib_list_string = [str(i) for i in mainlib_list_f]
             subset_library_f=list(dict.fromkeys(subset_library))
@@ -265,11 +278,14 @@ class mainWindow(QMainWindow):
             vt_block_string = [str(i) for i in vt_block_f]
             transistor_size_f=list(dict.fromkeys(transistor_size))
             transistor_size_string = [str(i) for i in transistor_size_f]
+
+            #add lists to ComboBox
             self.comboBox_Mainlib.addItems(mainlib_list_string)
             self.comboBox_Sublib.addItems(subset_library_string)
             self.comboBox_Vt.addItems(vt_block_string)
             self.comboBox_Size.addItems(transistor_size_string)
 
+            #data science Relation graphs filtering on csvs
             df=dfstd.copy()
             df.dropna(subset=['Shmoo Value'], inplace = True)
             df.drop(['File Index', 'Test Number', 'Period (Range)', 'DVDD (Range)', 'VDD (Range)', 'Result'], axis=1, inplace = True)
@@ -282,12 +298,11 @@ class mainWindow(QMainWindow):
             df2['Value'] = pd.to_numeric(df2['Value']).astype(float)
 
 
-
+            #read postprocessed csv mem file
             dfmem = pd.read_csv('resultsPerDir/mem.csv',dtype={"Chip Temp": str})
-            dfemaf = dfmem.drop_duplicates(['EMA#1'])
-            dfema = dfemaf['EMA#1']
-            # transform into list
-            ema_list_yield = dfema.values.tolist()
+
+            #drop duplicated emas for mem yield options based on inputs
+            ema_list_yield = list(dfmem['EMA#1'].unique())
             ema_list_string = [str(i) for i in ema_list_yield]
             # add list to ComboBox
             self.comboBox_EmaYield.addItems(ema_list_string)
@@ -295,80 +310,73 @@ class mainWindow(QMainWindow):
 
 
             df_ema_temp_samev = dfmem.loc[dfmem['VDDPE (Range)'] == dfmem['VDDCE (Range)']]
-            dfvolmemf = df_ema_temp_samev.drop_duplicates(['VDDPE (Range)'])
-            dfvolmem = dfvolmemf['VDDPE (Range)']
-            # transform into list
-            volmem_list = dfvolmem.values.tolist()
+            #drop duplicated voltage list options for mem yield options based on inputs
+            volmem_list= list(df_ema_temp_samev['VDDPE (Range)'].unique())
             volmem_list_string = [str(i) for i in volmem_list ]
             # add list to ComboBox
             self.comboBox_Voltage_MemYield.addItems(volmem_list_string)
 
-            #mem Vmin operations
-            #
-            #
 
+
+
+            #read postprocessed csv vminckb file
             dfmemckb = pd.read_csv('resultsPerDir/vminCkb.csv')
 
-            dfsplit = dfmemckb.drop_duplicates(['Chip Type'])
-            dfsplitlib = dfsplit['Chip Type']
-            # transform into list
-            split_list = dfsplitlib.values.tolist()
+            #drop duplicated split list options for mem shmoo options based on inputs
+            split_list = list(dfmemckb['Chip Type'].unique())
             split_list_string = [str(i) for i in split_list]
-            # add list to ComboBox
+            # add lists to ComboBox
             self.comboBox_SplitVmin.addItems(split_list_string)
             self.comboBox_Split_2.addItems(split_list_string)
             self.comboBox_SP_2.addItems(split_list_string)
 
-            dfarchi = dfmemckb.drop_duplicates(['Architecture'])
-            mem_list = dfarchi['Architecture'].values.tolist()
+            #drop duplicated architecture list options for mem vmin options based on inputs
+            mem_list = list(dfmemckb['Architecture'].unique())
             mem_list_string = [str(i) for i in mem_list ]
-
             # add list to ComboBox
             self.comboBox_Instance.addItems(mem_list_string)
 
-
-            # dfemalib = dfmemckb['EMA#1'].unique()
-
-            dfema = dfmemckb.drop_duplicates(['EMA#1'])
-            dfemalib = dfema['EMA#1']
-
-            # transform into list
-            ema_list_vmin = dfemalib.values.tolist()
+            #drop duplicated ema list options for mem vmin options based on inputs
+            ema_list_vmin= list(dfmemckb['EMA#1'].unique())
             ema_list_vmin_string = [str(i) for i in ema_list_vmin ]
             # add list to ComboBox
             self.comboBox_EmaVmin.addItems(ema_list_vmin_string)
 
-            #add ema for mem predict to comboBox
 
+
+            #add ema options for memory prediction to comboBox
             emapredictf = list(map(lambda x : x.lstrip('A'),ema_list_vmin))
             emapredict = list(map(int,emapredictf))
             emapredict_string = [str(i) for i in emapredict]
             self.comboBox_EMA1.addItems(emapredict_string)
 
-            #add ken to comboBox
-
+            #add ken options for memory prediction to comboBox
             ken= list(dfmemckb['KEN'].unique())
             ken_string = [str(i) for i in ken]
             self.comboBox_KEN.addItems(ken_string)
 
             return
     def memsel(self):
+        #memory voltage prediction section display
         radioButton_Mem = self.sender()
         if radioButton_Mem.isChecked():
             self.groupBox_Pmem.show()
             self.groupBox_Pstd.hide()
             try:
+                #disconnect previous pushButton status subscribtion
                 self.pushButton_5.clicked.disconnect()
             except:
                 pass
             self.pushButton_5.clicked.connect(self.mempredict)
         return
     def scsel(self):
+        #std cell voltage prediction section display
         radioButton_SC = self.sender()
         if radioButton_SC.isChecked():
             self.groupBox_Pstd.show()
             self.groupBox_Pmem.hide()
             try:
+                #disconnect previous pushButton status subscribtion
                 self.pushButton_5.clicked.disconnect()
             except:
                 pass
@@ -377,6 +385,7 @@ class mainWindow(QMainWindow):
     def mempredict(self):
         global emapredict,temp_list,split_list,ken
 
+        #read inputs from the comboBox
         inxTemp = self.comboBox_Temp_P_2.currentIndex()
         temperature = temp_list[inxTemp]
 
@@ -470,6 +479,8 @@ class mainWindow(QMainWindow):
     def scpredict(self):
         # global dfstd,library_names_list
         global temp_list,mainlib_list_f,vt_block_f,transistor_size_f,split_list_vmin
+
+        # reading inputs from the comboBox
         inxTemp = self.comboBox_Temp_P.currentIndex()
         temperature = temp_list[inxTemp]
         if temperature == 'M40':
@@ -567,6 +578,7 @@ class mainWindow(QMainWindow):
         global df
         # boxplot -> library comparison
 
+        # reading inputs from the comboBox
         inxSplit = self.comboBox_SciSplit.currentIndex()
         split = split_list_vmin[inxSplit]
         libPlot = df.loc[df['Process'] == split]
@@ -585,15 +597,10 @@ class mainWindow(QMainWindow):
         return
     def ml4(self):
         global df2
-
-
-
         # scatter plot
 
         sns.catplot(x="Chip Type", y="Value", data=df2, col = 'Chip Temp', hue = 'Leakage Test Type')
         plt.show()
-
-
 
         return
 
@@ -628,6 +635,7 @@ class mainWindow(QMainWindow):
     def sc_vmin_data(self):
            global temp_list,dfstd,library_names_list
 
+           # reading inputs from the comboBox
            spec_vol = self.vspecStd.value()
            inxTemp = self.comboBox_Temp.currentIndex()
            temp = temp_list[inxTemp]
@@ -678,8 +686,7 @@ class mainWindow(QMainWindow):
     def std_cell_yield(self):
 
         global temp_list,dfstd
-        # user selection
-
+        # reading inputs from the comboBox
         inxTemp = self.comboBox_Temp.currentIndex()
         temp = temp_list[inxTemp]
         dftemp = dfstd.loc[dfstd['Chip Temp'] == temp]
@@ -702,7 +709,7 @@ class mainWindow(QMainWindow):
     def memory_yield_summary(self):
 
         global temp_list,dfmem,ema_list_yield,volmem_list
-        # user selection
+        # reading inputs from the comboBox
         inxTemp = self.comboBox_Temp.currentIndex()
         temp = temp_list[inxTemp]
         dftemp = dfmem.loc[dfmem['Chip Temp'] == temp]
@@ -755,6 +762,7 @@ class mainWindow(QMainWindow):
     def mem_vmin_data_ema(self):
         global temp_list,dfmem,dfmemckb,mem_list,split_list
 
+        #finding required data frame based on inputs
         spec_vol = self.vspecMem.value()
 
         inxSplit = self.comboBox_SplitVmin.currentIndex()
@@ -795,7 +803,8 @@ class mainWindow(QMainWindow):
 
     def mem_vmin_data_instance(self):
         global temp_list,dfmem,dfmemckb,ema_list_vmin,split_list
-        #finding required data frame based on inputs
+
+        #finding required dataframe based on inputs
 
         spec_vol = self.vspecMem.value()
         inxSplit = self.comboBox_SplitVmin.currentIndex()
@@ -810,8 +819,8 @@ class mainWindow(QMainWindow):
         dftemp_ema = dftemp.loc[dftemp['EMA#1'] == default_ema]
 
 
-        dfmems = dftemp_ema.drop_duplicates(['Architecture'])
-        mem_list = dfmems['Architecture'].values.tolist()
+
+        mem_list = list(dftemp_ema['Architecture'].unique())
 
         #plotting memory instance in different graphs(too many mem instances)
         head_index = 0
@@ -855,7 +864,8 @@ class mainWindow(QMainWindow):
 
     def sc_shamoo_data(self):
         global dfstd,temp_list,split_list_vmin
-        #finding required data frame based on inputs
+
+        #finding required dataframe based on inputs
 
         v1 = self.v1std.value()
         v2 = self.v2std.value()
@@ -867,9 +877,8 @@ class mainWindow(QMainWindow):
         dftemp = df.loc[df['Chip Temp'] == temp]
 
         #obtain rows
-        dflibf = dfstd.drop_duplicates(['Test Item'])
-        dflib = dflibf['Test Item']
-        library_list = dflib.values.tolist()
+
+        library_list = list(dfstd['Test Item'].unique())
         rows = library_list
 
         #obtain columns
@@ -925,7 +934,7 @@ class mainWindow(QMainWindow):
     def memory_shamoo_data(self):
         global dfmemckb,temp_list,split_list
 
-        #finding required data frame based on inputs
+        #finding required dataframe based on inputs
 
         v1 = self.v1Mem.value()
         v2 = self.v2Mem.value()
@@ -946,8 +955,8 @@ class mainWindow(QMainWindow):
         columns = vol_list
 
         # obtain rows
-        dfmemf = df.drop_duplicates(['Architecture'])
-        mem_instances_list = dfmemf['Architecture'].values.tolist()
+
+        mem_instances_list =list(df['Architecture'].unique())
         rows = mem_instances_list
         # obtain max. shamoo value as standard
         # if vol < shamoo: 'f' else: 'p'

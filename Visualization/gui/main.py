@@ -604,6 +604,9 @@ class mainWindow(QMainWindow):
 
         return
 
+    """
+    used to calculate prob. of pass
+    """
     def calc_prob(self,df):
 
            df_shamoo = df.loc[df['Shmoo Value'].isnull() == False]
@@ -630,8 +633,11 @@ class mainWindow(QMainWindow):
                   count = 0
            return prob_list,voltage_list
 
-
-
+    """
+    inputs: temperature,library name,chip type
+    x-axis:vdd
+    y-axis:probability of pass
+    """
     def sc_vmin_data(self):
            global temp_list,dfstd,library_names_list
 
@@ -683,6 +689,12 @@ class mainWindow(QMainWindow):
            plt.show()
            return
 
+    """
+    inputs: voltage,temperature,chip type
+    x-axis:library name
+    y-axis:yield
+    """
+
     def std_cell_yield(self):
 
         global temp_list,dfstd
@@ -706,6 +718,13 @@ class mainWindow(QMainWindow):
         fig.autofmt_xdate()
         plt.show()
         return
+
+    """
+    inputs:voltage, temperature,ema
+    x-axis:library names
+    y-axis:yield
+
+    """
     def memory_yield_summary(self):
 
         global temp_list,dfmem,ema_list_yield,volmem_list
@@ -759,6 +778,12 @@ class mainWindow(QMainWindow):
         plt.show()
         return
 
+    """
+    inputs: memory instance,temperature
+    x-axis:vdd
+    y-axis:probability of pass
+    plots for different emas
+    """
     def mem_vmin_data_ema(self):
         global temp_list,dfmem,dfmemckb,mem_list,split_list
 
@@ -801,6 +826,12 @@ class mainWindow(QMainWindow):
         plt.show()
         return
 
+    '''
+    inputs: ema = default(A2),temperature
+    x-axis:vdd
+    y-axis:probability of pass
+    plots for different memory instance
+    '''
     def mem_vmin_data_instance(self):
         global temp_list,dfmem,dfmemckb,ema_list_vmin,split_list
 
@@ -862,6 +893,12 @@ class mainWindow(QMainWindow):
         plt.show()
         return
 
+    """
+    inputs:temperature,dataset,start voltage,end voltage
+    rows:library names
+    columns:voltage range,step is 20mV(default)
+    cell_text: p/f
+    """
     def sc_shamoo_data(self):
         global dfstd,temp_list,split_list_vmin
 
@@ -931,6 +968,12 @@ class mainWindow(QMainWindow):
         plt.show()
         return
 
+    """
+    inputs:temperature,dataset,start voltage,end voltage
+    rows:memory instances
+    columns:voltage range,step is 20mV(default)
+    cell_text: p/f
+    """
     def memory_shamoo_data(self):
         global dfmemckb,temp_list,split_list
 

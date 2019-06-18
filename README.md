@@ -41,6 +41,10 @@ python3 main.py
 ## GUI Design
 ## Data Visualization
 ## Data Science
+
+This part of the project focused on extracting knowledge from the data and displaying it in a practical way. ARM's current process focuses on vizualization of the test results. However, little insight is gained into the relationships between the cells' (and wafers') parameters and their behaviours under different testing conditions.
+First of all, boxplots and correlation matrices were introduced to highlight explore Standard Cell behaviour as a function of temperature, process split, and design. After these were analysed, key features for predicting Vmin were selected (Yield was 100% in the given dataset, hence no conclusions could be made) and a machine learning model was built to predict Vmin values depen
+
 ## Contributing
 
 As the project is part of the EE3-DTPRJ Design and Build Project (2018-2019) at Imperial College London, we do not accept external pull requests.

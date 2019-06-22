@@ -382,7 +382,7 @@ class mainWindow(QMainWindow):
                 pass
             self.pushButton_5.clicked.connect(self.scpredict)
         return
-    
+
     # predicts Memory Vmin from user input
     def mempredict(self):
         global emapredict,temp_list,split_list,ken
@@ -406,11 +406,13 @@ class mainWindow(QMainWindow):
 
         EMA1Vals = list(np.zeros(len(emapredict), dtype = int))
 
-     
+
         # Select only the first half of the memory architecture (more specific than architecture type
         # but less specific than the whole architecture) because there are too many individual ones
         architectureTrimmed = re.search('[A-Za-z0-9]+', architecture).group(0)
-        archTypes = list(set(architectureTrimmed)) # return only unique values
+        # archTypes = list(set(architectureTrimmed)) # return only unique values
+        archTypes = ['RA1HD', 'RA1HDA', 'RA1UHD', 'RA1UHDA', 'RA2PUHD', 'RA2PUHDA', 'RADPUHD', 'RF1HD','RF1HDA'
+         , 'RF1UHD', 'RF2AHS', 'RF2HS','ROV', 'ROVA', 'SRAMSPHD', 'SRAMSPUHD', 'cln16ffcll']
 
         # used to one hot encore process values in feature vector (all are set to 0, and 1 value
         # will be set to 1, depending on the user input)
@@ -418,12 +420,13 @@ class mainWindow(QMainWindow):
         # processValues = [0,0,0,0,0]
 
         # Same as above but for architecture
-        oneHotArch = np.zeros(len(archTypes)
+        #oneHotArch = np.zeros(len(archTypes)）
+        oneHotArch = np.zeros(17)
 
         # initialize with temperature
         inputVector = [float(temperature)/150.0]
 
-        #
+
         for i in range(len(archTypes)):
           if archTypes[i] == architectureTrimmed:
             oneHotArch[i] = 1
@@ -478,7 +481,7 @@ class mainWindow(QMainWindow):
         msg.setIcon(QMessageBox.Information)
         msg.setWindowTitle('Result')
         msg.setText('The Predicted Mem Voltage Value is '+ str(result)+' V')
-                              
+
         msg.setStandardButtons(QMessageBox.Cancel)
         exe = msg.exec_()
 
@@ -570,7 +573,7 @@ class mainWindow(QMainWindow):
         msg.setStandardButtons(QMessageBox.Cancel)
         exe = msg.exec_()
         return
-        
+
     # Boxplot of Vmin distribution by Process split and Temperature
     def ml(self):
         global df
@@ -604,7 +607,7 @@ class mainWindow(QMainWindow):
         global df
         nominal.associations(df, nominal_columns=['Process','Library'], theil_u= True)
         return
-                              
+
     # scatter plot of pin leakage by temperature and process split
     def ml4(self):
         global df2

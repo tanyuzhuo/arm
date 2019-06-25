@@ -150,24 +150,74 @@ Overall, the demo GUI/application includes a general template/baseline as a refe
 
 
 ## Data Visualization
-After extracting core information about the data, this part of the project aims to display the data as the client required. Two python library(pandas and matplotlib) are exploited at this part. Different type of graphs can be displayed simultaneously, therefore the client can make a comparison on them. Generally, it has seven different kinds of graphs with different inputs:
+After extracting core information about the data, this part of the project aims to display the data as the client required. Two python library(pandas and matplotlib) are exploited at this part. Different type of graphs can be displayed simultaneously, therefore the client can make a comparison on them. Generally, it has 7 different kinds of graphs with different inputs:
 
-1.standard cell yield data(inputs: voltage, temperature)
+**1.standard cell yield data(inputs: voltage, temperature)**
 
-2.probability plot for standard cell vmin test data(inputs: library name, temperature)
+summary and analysis: The standard cell yield for 'SS/SF/FS/FF/TT' process is  'xxx'% for all the tested libraries at the tested voltage and temperature conditions.
 
-3.standard cell shamoo data for SS/SF/FS/FF/TT process(inputs: temperature)
+**2.probability plot for standard cell vmin test data(inputs: library name, temperature, operating specification voltage)**
 
-4.memory yield summary(inputs: voltage, temperature)
+summary and analysis: At all process corners, Vmin of all standard cell libraries are lower than  the specification at all temperatures, which is the expected trend.
 
-5.probability plot for memory vmin test data for SS/SF/FS/FF/TT process(inputs: memory instance, temperature)
+**3.standard cell shamoo data for SS/SF/FS/FF/TT process(inputs: temperature)**
 
-6.probability plot for memory vmin test data for SS/SF/FS/FF/TT process(inputs:EMA, temperature )
+This section shows the standard cell functional shmoo data for SS process.Tests were performed between start voltage and end voltage defined by the client in 20mV increments. 
 
-7.memory shamoo data for SS/SF/FS/FF/TT process(inputs: temperature)
+**4.memory yield summary(inputs: voltage, temperature)**
+
+summary and analysis: The memory yield 'xxx'% at all process corners, for all the tested libraries at the tested voltage, temperature and EMA conditions
+
+**5.probability plot for memory vmin test data for SS/SF/FS/FF/TT process(inputs: memory instance, temperature,operating specification voltage)**
+
+summary and analysis: All memory instances meet the Vmin specification at SS/SF/FS/FF/TT corner.
+
+**6.probability plot for memory vmin test data for SS/SF/FS/FF/TT process(inputs:EMA, temperature )**
+
+summary and analysis: All memory instances meet the Vmin specification at SS/SF/FS/FF/TT corner.
+
+**7.memory shamoo data for SS/SF/FS/FF/TT process(inputs: temperature)**
+
+This section shows memory shmoo test for SS process at different temperatures.  
+
 
 Displayed graphs on GUI can be found in [data visualization graphs](https://github.com/tanyuzhuo/arm/tree/master/Visualization/data%20visualization%20graphs) folder.
+The hard part of data visualization is when plotting the probability of pass of standard cell vmin data and memory vmin data. Each percentage of the pass is calculated by number of shamoo value smaller than each voltage divided by the total number of shamoo value. This algorithm is used several times throughtout plotting.
+Following is the algorithm used for plotting probability of pass:
 
+
+```
+def calc_prob(df):
+       df_shamoo = df.loc[df['Shmoo Value'].isnull() == False]
+       shamoo_value = df_shamoo['Shmoo Value']
+       shamoo_value_list = shamoo_value.values.tolist()
+       #obtain x-axis
+       voltage_list = []
+       v1 = min(shamoo_value_list) - 0.1
+       v2 = max(shamoo_value_list) + 0.1
+       tmpv = v1
+       while (tmpv <= v2):
+              voltage_list.append(tmpv)
+              tmpv += 0.02
+              tmpv = round(tmpv, 2)
+
+       # percentage = No. of (shamoo value < each vdd value) / total number of shamoo value
+       prob_list = []
+       count = 0
+       for vol in voltage_list:
+              for value in shamoo_value_list:
+                     if (value < vol):
+                            count += 1
+              prob_list.append(100 * count / len(shamoo_value_list))
+              count = 0
+       return prob_list,voltage_list
+```
+Another issue that happened when implementing plotting is that the Mac OS X system crashed when trying to display graphs. This is due to the matplotlib library have conflicts with the GUI system. The solution to solve this is setting 'Qt5Agg' backend, and following is the code which implements this:
+```buildoutcfg
+import matplotlib
+matplotlib.use("Qt5Agg")
+
+```
 ## Data Science
 
 This part of the project focused on extracting knowledge from the data and displaying it in a practical way. ARM's current process focuses on vizualization of the test results. However, little insight is gained into the relationships between the cells' (and wafers') parameters and their behaviours under different testing conditions.

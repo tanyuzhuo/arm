@@ -166,7 +166,7 @@ After extracting core information about the data, this part of the project aims 
 
 7.memory shamoo data for SS/SF/FS/FF/TT process(inputs: temperature)
 
-Displayed graphs on GUI can be found in [github.com/haankers](https://github.com/haankers)
+Displayed graphs on GUI can be found in [data visualization graphs](https://github.com/tanyuzhuo/arm/tree/master/Visualization/data%20visualization%20graphs) folder.
 
 ## Data Science
 

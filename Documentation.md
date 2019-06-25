@@ -28,7 +28,7 @@ More questions in depth were asked about the pre-processing and data science par
 
 
 ## Fourth Meeting 
-### Received feedback from Dr. Cilberto，Skype with Chris Hawkins and Tao Dou on the 6th of June.
+### Received feedback from Dr. Cilbert + Skype with Chris Hawkins and Tao Dou on the 6th of June.
 
 
 #### ARM Data Science and Visualization Leaflet Front View

@@ -4,6 +4,8 @@
 
 We were given a presentation of the project including the data we would be given, ARM's workflow regarding the treatment of the data, and what was expected from us. We got to ask questions to clear up some unclear points and signed an NDA without which we could not get hold of the data. 
 
+
+
 ## Second Meeting and Follow up questions
 ### Skype with Chris Hawkins, ARM's engineer on the 16th of May.
 
@@ -13,11 +15,15 @@ We were given the chance to ask Chris about the following questions relating to 
 3. Further data logs needed in order to generate BA data or Correlation script output.
 4. Expectation of the scope of the project (data set, sections, etc..).
 
+
+
 ## Third Meeting and more questions
 ### Skype with Chris Hawkins and Tao Dou on the 24th of May.
 
 More questions in depth were asked about the pre-processing and data science part of the project. 
 (Data science stuff neeeded ...) 
+
+
 
 ## Project update on the 28th of June.
 
@@ -27,15 +33,21 @@ More questions in depth were asked about the pre-processing and data science par
 ### Skype with Chris Hawkins and Tao Dou on the 6th of June.
 ### Received feedback from Dr. Cilberto.
 
+ARM Data Science and Visualization Leaflet Front View
 ![Image Text](https://github.com/tanyuzhuo/arm/blob/master/Images/ARM%20leaflet%201.PNG)
+
+ARM Data Science and Visualization Leaflet Back View
 ![Image Text](https://github.com/tanyuzhuo/arm/blob/master/Images/ARM%20leaflet%202.PNG)
 
 We recevied very positive feedback about the leaflet and poster both from our client ARM and our supervisor Dr. Cilberto. Few changes were made about the design including size of fonts and graphs. Questions about data visualization were answered during the skype call ... (Data science stuff neeeded ...) 
 
 
+
 ## Project update on the 7th of June.
 
 The group has started to work on merging each parts of the project together. Progress was updated daily between group members and support was received actively. Final version of leaflet has been printed out in hard copies. 
+
+
 
 ## Project update on the 12th of June.
 ### Last day before Hackbooth.

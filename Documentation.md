@@ -27,6 +27,8 @@ More questions in depth were asked about the pre-processing and data science par
 ### Skype with Chris Hawkins and Tao Dou on the 6th of June.
 ### Received feedback from Dr. Cilberto.
 
+![Image Text](https://github.com/tanyuzhuo/arm/blob/master/Images/ARM%20leaflet%201.PNG)
+
 We recevied very positive feedback about the leaflet and poster both from our client ARM and our supervisor Dr. Cilberto. Few changes were made about the design including size of fonts and graphs. Questions about data visualization were answered during the skype call ... (Data science stuff neeeded ...) 
 
 

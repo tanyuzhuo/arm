@@ -40,6 +40,7 @@ python3 main.py
 ## Preprocessing
 ## GUI Design
 ## Data Visualization
+This
 ## Data Science
 
 This part of the project focused on extracting knowledge from the data and displaying it in a practical way. ARM's current process focuses on vizualization of the test results. However, little insight is gained into the relationships between the cells' (and wafers') parameters and their behaviours under different testing conditions.

@@ -28,6 +28,7 @@ More questions in depth were asked about the pre-processing and data science par
 ### Received feedback from Dr. Cilberto.
 
 ![Image Text](https://github.com/tanyuzhuo/arm/blob/master/Images/ARM%20leaflet%201.PNG)
+![Image Text](https://github.com/tanyuzhuo/arm/blob/master/Images/ARM%20leaflet%202.PNG)
 
 We recevied very positive feedback about the leaflet and poster both from our client ARM and our supervisor Dr. Cilberto. Few changes were made about the design including size of fonts and graphs. Questions about data visualization were answered during the skype call ... (Data science stuff neeeded ...) 
 
@@ -38,5 +39,8 @@ The group has started to work on merging each parts of the project together. Pro
 
 ## Project update on the 12th of June.
 ### Last day before Hackbooth.
+
+ARM Data Science and Visualization Poster
+![Image Text](https://github.com/tanyuzhuo/arm/blob/master/Images/ARM%20poster.PNG)
 
 The dashboard prototype has been finalised and is ready to be presented at the Hackbooth event. We have practiced and prepared a short presentation briefing on our project including an introduction and three main elements of the project. Poster and monitor has been requested and set up.

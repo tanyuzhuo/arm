@@ -150,7 +150,24 @@ Overall, the demo GUI/application includes a general template/baseline as a refe
 
 
 ## Data Visualization
-This
+After extracting core information about the data, this part of the project aims to display the data as the client required. Two python library(pandas and matplotlib) are exploited at this part. Different type of graphs can be displayed simultaneously, therefore the client can make a comparison on them. Generally, it has seven different kinds of graphs with different inputs:
+
+1.standard cell yield data(inputs: voltage, temperature)
+
+2.probability plot for standard cell vmin test data(inputs: library name, temperature)
+
+3.standard cell shamoo data for SS/SF/FS/FF/TT process(inputs: temperature)
+
+4.memory yield summary(inputs: voltage, temperature)
+
+5.probability plot for memory vmin test data for SS/SF/FS/FF/TT process(inputs: memory instance, temperature)
+
+6.probability plot for memory vmin test data for SS/SF/FS/FF/TT process(inputs:EMA, temperature )
+
+7.memory shamoo data for SS/SF/FS/FF/TT process(inputs: temperature)
+
+Displayed graphs on GUI can be found in [github.com/haankers](https://github.com/haankers)
+
 ## Data Science
 
 This part of the project focused on extracting knowledge from the data and displaying it in a practical way. ARM's current process focuses on vizualization of the test results. However, little insight is gained into the relationships between the cells' (and wafers') parameters and their behaviours under different testing conditions.

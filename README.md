@@ -12,7 +12,7 @@ Clone the repository into your local directory to get the source code.
 
 ### Prerequisites
 
-You will need [Python 3](https://www.python.org) installed, a data folder provided by ARM that contains all the raw ASCII data txt files.
+You will need [Python 3](https://www.python.org) installed, a data folder provided by ARM that contains all the raw ASCII data txt files(NDA needed).
 
 ### Installing
 

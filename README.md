@@ -240,12 +240,15 @@ This part of the project focused on extracting knowledge from the data and displ
 
 First of all, boxplots and correlation matrices were built to explore Standard Cell behaviour as a function of temperature, process split, and design (library, size, etc) as can be seen in the example below. After these were analysed, key features for predicting Vmin were selected (Yield was 100% in the given dataset, hence no conclusions could be made). The goal was to design and train a Machine Learning model to predict Vmin values based on the variable parameters using in the chip testing process.
 
-![Boxplot](https://github.com/tanyuzhuo/arm/blob/master/Images/boxplot.png)
-
+![Boxplot](https://github.com/tanyuzhuo/arm/blob/master/Images/boxplot2.png)
 
 The initial step when tackling this problem was to better understand the dataset available to build the model. The "vminStd.csv" file contained 9696 Vmin test results, and included all the parameters relevant to predicting Vmin. The data was split into a training set of 8196 datapoints, and was tested on a dataset of dimension 1500. Features used to train the model were selected by eliminating unuseful data (such as the test number, which is randomly assigned to each line of the datalog, and hence the .csv file). Then, the correlation data previously cited was used to narrow down the list.
 
-The following step consisted of training different models and comparing their performances to select the optimal one, which would be incorporated to the dashboard discussed previously. Three very different model types were explored: a Random Forest regressor, a Perceptron and a Gaussian Process regressor. More information about how these models were implemented in practice can be found in the documentation. The organic way in which categorical data in handled by decision trees made Random Forests the obvious choice for the first attempt. The performance was more than correct, since the mean absolute error on the test set was of 1.9%. The two other models were built for comparison purposes. The perceptron was used as a benchmark, linear regression being the go-to model in regression. Finally, the Gaussian Process route was explored according to suggestions from an ARM data scientist. None performed as well as the Random Forest did, which confirmed our initial assumption.
+The following step consisted of training different models and comparing their performances to select the optimal one, which would be incorporated to the dashboard discussed previously. Three very different model types were explored: a Random Forest regressor, a Perceptron and a Gaussian Process regressor. More information about how these models were implemented in practice can be found in the jupyter notebooks in this repository. The organic way in which categorical data in handled by decision trees made Random Forests the obvious choice for the first attempt. The performance was more than correct, since the mean absolute error on the test set was of 1.9%. The two other models were built for comparison purposes. The perceptron was used as a benchmark, linear regression being the go-to model in regression. Finally, the Gaussian Process route was explored according to suggestions from an ARM data scientist. None performed as well as the Random Forest did, which confirmed our initial assumption.
+
+#### Comparison of the error plots for the SGD Regressor (left) and the Random Forest (right).
+![SGD](https://github.com/tanyuzhuo/arm/blob/master/Images/SGD.png)
+![RF](https://github.com/tanyuzhuo/arm/blob/master/Images/RF.png)
 
 The same process was applied to `vminCkb.csv` to predict Vmin for memory cells.
 

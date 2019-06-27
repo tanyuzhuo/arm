@@ -252,8 +252,9 @@ The following step consisted of training different models and comparing their pe
 
 The same process was applied to `vminCkb.csv` to predict Vmin for memory cells.
 
-Finally, analysis of pin leakage in the test chips was analysed using scatter plots, as can be seen in the image below. No
+Finally, pin leakage in the test chips was analysed using scatter plots, as can be seen in the image below. Clearly, the leakage is strongly influenced by the test parameters, as shown in the plot below. We explored the relationships between the current leakage and pin voltage tests but did not manage to obtain any useful information. A potential next step in the project would be to explore this further as there might be a way to incorporate that data in the Machine Learning models to increase their performance.
 
+![Leakage](https://github.com/tanyuzhuo/arm/blob/master/Images/leakage.png)
 
 ## Contributing
 

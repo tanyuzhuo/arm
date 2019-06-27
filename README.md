@@ -240,7 +240,7 @@ This part of the project focused on extracting knowledge from the data and displ
 
 First of all, boxplots and correlation matrices were built to explore Standard Cell behaviour as a function of temperature, process split, and design (library, size, etc) as can be seen in the example below. After these were analysed, key features for predicting Vmin were selected (Yield was 100% in the given dataset, hence no conclusions could be made). The goal was to design and train a Machine Learning model to predict Vmin values based on the variable parameters using in the chip testing process.
 
-![Boxplot](https://github.com/tanyuzhuo/arm/blob/master/Images/boxplot2.png)
+![Boxplot](https://github.com/tanyuzhuo/arm/blob/master/Images/boxplot.png)
 
 The initial step when tackling this problem was to better understand the dataset available to build the model. The "vminStd.csv" file contained 9696 Vmin test results, and included all the parameters relevant to predicting Vmin. The data was split into a training set of 8196 datapoints, and was tested on a dataset of dimension 1500. Features used to train the model were selected by eliminating unuseful data (such as the test number, which is randomly assigned to each line of the datalog, and hence the .csv file). Then, the correlation data previously cited was used to narrow down the list.
 

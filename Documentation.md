@@ -20,11 +20,11 @@ We were given the chance to ask Chris about the following questions relating to 
 ### Skype with Chris Hawkins and Tao Dou on the 24th of May.
 
 More questions in depth were asked about the pre-processing and data science part of the project. 
-(Data science stuff neeeded ...) 
+
  
 
 ## Project update on the 28th of June.
-
+Started building our dashboard using PyQT5 and Qt Designer. Designed a much more efficient pre-processing method which siginificantly shorten the processing time. 
 
 
 ## Fourth Meeting 
@@ -37,7 +37,7 @@ More questions in depth were asked about the pre-processing and data science par
 #### ARM Data Science and Visualization Leaflet Back View
 ![Image Text](https://github.com/tanyuzhuo/arm/blob/master/Images/ARM%20leaflet%202.PNG)
 
-We recevied very positive feedback about the leaflet and poster both from our client ARM and our supervisor Dr. Cilberto. Few changes were made about the design including size of fonts and graphs. Questions about data visualization were answered during the skype call ... (Data science stuff neeeded ...) 
+We recevied very positive feedback about the leaflet and poster both from our client ARM and our supervisor Dr. Cilberto. Few changes were made about the design including size of fonts and graphs. Questions about data visualization were answered during the skype call.
 
 
 ## Project update on the 7th of June.
